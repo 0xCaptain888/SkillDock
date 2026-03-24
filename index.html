@@ -1,0 +1,3247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillDock — Agent Skill Store for Solana Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+/* === RESET & VARIABLES === */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg-deep: #06080d;
+  --bg-phone: #0b0e16;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2236;
+  --bg-surface: #151c2c;
+  --sol-purple: #9945FF;
+  --sol-green: #14F195;
+  --sol-blue: #00D1FF;
+  --accent-gradient: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+  --accent-gradient-h: linear-gradient(90deg, #9945FF 0%, #14F195 100%);
+  --text-primary: #e8ecf4;
+  --text-secondary: #7a8599;
+  --text-dim: #4a5568;
+  --border: rgba(255,255,255,0.06);
+  --glow-purple: rgba(153,69,255,0.25);
+  --glow-green: rgba(20,241,149,0.2);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+html, body {
+  height: 100%;
+  background: var(--bg-deep);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 20%, rgba(153,69,255,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(20,241,149,0.05) 0%, transparent 50%),
+              var(--bg-deep);
+}
+
+/* === AMBIENT PARTICLES === */
+.ambient-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === OUTER WRAPPER === */
+.showcase-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  padding: 40px;
+}
+.showcase-info {
+  max-width: 380px;
+  opacity: 0;
+  transform: translateX(-30px);
+}
+.showcase-info .logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.showcase-info .logo-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--accent-gradient);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.showcase-info .logo-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.showcase-info h2 {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+.showcase-info h2 span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.showcase-info p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.showcase-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.showcase-badges .badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.showcase-badges .badge.sol { border-color: rgba(153,69,255,0.3); color: #c4a0ff; }
+.showcase-badges .badge.green { border-color: rgba(20,241,149,0.3); color: #14F195; }
+
+/* === PHONE FRAME === */
+.phone-frame {
+  position: relative;
+  width: 380px;
+  height: 780px;
+  border-radius: 48px;
+  background: linear-gradient(145deg, #1a1f2e 0%, #0d1017 100%);
+  border: 2px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.5),
+    0 25px 60px rgba(0,0,0,0.5),
+    0 0 120px rgba(153,69,255,0.08),
+    0 0 200px rgba(153,69,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  padding: 12px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px);
+  z-index: 1;
+}
+.phone-glow-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50px;
+  background: var(--accent-gradient);
+  opacity: 0.12;
+  z-index: -1;
+  filter: blur(2px);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%,100%{opacity:0.08} 50%{opacity:0.18} }
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 30px;
+  background: #000;
+  border-radius: 0 0 18px 18px;
+  z-index: 100;
+}
+.phone-frame::after {
+  content: '';
+  position: absolute;
+  top: 19px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: #111;
+  border-radius: 50%;
+  z-index: 101;
+  box-shadow: 0 0 6px rgba(153,69,255,0.6), inset 0 0 3px rgba(153,69,255,0.3);
+}
+.phone-label {
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.phone-label span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 38px;
+  background: var(--bg-phone);
+  overflow: hidden;
+  position: relative;
+}
+
+/* === STATUS BAR === */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 50;
+}
+.status-bar .time { font-family: var(--font-mono); font-size: 13px; }
+.status-icons { display: flex; gap: 6px; align-items: center; font-size: 11px; }
+.status-icons svg { width: 16px; height: 16px; fill: var(--text-primary); }
+
+/* === LIVE TICKER === */
+.live-ticker {
+  background: linear-gradient(90deg, rgba(153,69,255,0.12), rgba(20,241,149,0.08));
+  border-bottom: 1px solid var(--border);
+  padding: 6px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+.ticker-track {
+  display: flex;
+  gap: 32px;
+  animation: tickerScroll 25s linear infinite;
+  width: max-content;
+}
+.ticker-item {
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ticker-item .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--sol-green);
+  animation: pulse 2s infinite;
+}
+@keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* === SCREEN CONTENT === */
+.screen-content {
+  height: calc(100% - 138px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-content::-webkit-scrollbar { display: none; }
+
+/* === TAB VIEWS === */
+.tab-view { display: none; padding: 0 16px 20px; }
+.tab-view.active { display: block; }
+
+/* === DISCOVER TAB === */
+.discover-header {
+  padding: 16px 0 12px;
+}
+.discover-header h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.discover-header h1 span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.discover-header .subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Search bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  margin: 12px 0 16px;
+  transition: border-color 0.3s;
+}
+.search-bar:focus-within { border-color: rgba(153,69,255,0.4); }
+.search-bar svg { width: 18px; height: 18px; fill: var(--text-dim); flex-shrink: 0; }
+.search-bar input {
+  background: none; border: none; outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  width: 100%;
+}
+.search-bar input::placeholder { color: var(--text-dim); }
+
+/* Category chips */
+.category-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.category-chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.chip.active, .chip:hover {
+  background: linear-gradient(135deg, rgba(153,69,255,0.2), rgba(20,241,149,0.1));
+  border-color: rgba(153,69,255,0.4);
+  color: var(--text-primary);
+}
+
+/* Section header */
+.section-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section-hdr h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+.section-hdr .see-all {
+  font-size: 12px;
+  color: var(--sol-purple);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Featured skill card */
+.featured-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(153,69,255,0.15) 0%, rgba(20,241,149,0.08) 100%);
+  border: 1px solid rgba(153,69,255,0.2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.featured-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(153,69,255,0.15);
+}
+.featured-card .feat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--accent-gradient);
+  color: #000;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.featured-card h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.featured-card .feat-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.featured-card .feat-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.featured-card .feat-price {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sol-green);
+}
+.featured-card .feat-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.featured-card .feat-stats span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.featured-card .glow-orb {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(153,69,255,0.25), transparent 70%);
+  pointer-events: none;
+}
+
+/* Skill card grid */
+.skill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.skill-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.skill-card:hover {
+  border-color: rgba(153,69,255,0.3);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.skill-card .skill-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+}
+.skill-card .skill-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.skill-card .skill-creator {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.skill-card .skill-creator .verified {
+  color: var(--sol-blue);
+  font-size: 12px;
+}
+.skill-card .skill-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.skill-card .skill-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sol-green);
+}
+.skill-card .skill-installs {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.skill-card .card-glow {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(20,241,149,0.1), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.skill-card:hover .card-glow { opacity: 1; }
+
+/* === TRENDING TAB === */
+.trending-list { padding-top: 16px; }
+.trending-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.trending-item:last-child { border: none; }
+.trending-rank {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dim);
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.trending-rank.gold { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.trending-icon { font-size: 28px; flex-shrink: 0; }
+.trending-info { flex: 1; min-width: 0; }
+.trending-info .name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.trending-info .stats {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.trending-change {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.trending-change.up { background: rgba(20,241,149,0.1); color: var(--sol-green); }
+.trending-change.down { background: rgba(255,80,80,0.1); color: #ff5050; }
+
+/* === AGENT TAB === */
+.agent-profile {
+  text-align: center;
+  padding: 44px 0 16px;
+}
+.agent-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: var(--accent-gradient);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(153,69,255,0.3);
+}
+.agent-avatar .online-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: var(--sol-green);
+  border-radius: 50%;
+  border: 3px solid var(--bg-phone);
+  animation: pulse 2s infinite;
+}
+.skill-orbit {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbitSpin 20s linear infinite;
+  pointer-events: none;
+}
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(153,69,255,0.15);
+  border-radius: 50%;
+}
+.orbit-skill {
+  position: absolute;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid rgba(153,69,255,0.2);
+  border-radius: 8px;
+  animation: orbitCounterSpin 20s linear infinite;
+}
+@keyframes orbitSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+@keyframes orbitCounterSpin { to { transform: rotate(-360deg); } }
+.agent-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.agent-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.agent-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.agent-stat {
+  text-align: center;
+}
+.agent-stat .val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+}
+.agent-stat .val.green { color: var(--sol-green); }
+.agent-stat .label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.installed-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.installed-section h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.installed-skill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.installed-skill:last-child { border: none; }
+.installed-skill .is-icon { font-size: 22px; flex-shrink: 0; }
+.installed-skill .is-info { flex: 1; }
+.installed-skill .is-name { font-size: 13px; font-weight: 600; }
+.installed-skill .is-status { font-size: 11px; color: var(--sol-green); }
+.installed-skill .is-active-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--sol-green);
+  box-shadow: 0 0 6px var(--sol-green);
+}
+
+/* Activity log */
+.activity-log-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.activity-log-item:last-child { border: none; }
+.al-time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  width: 46px;
+}
+.al-text { color: var(--text-secondary); line-height: 1.4; }
+.al-text strong { color: var(--text-primary); font-weight: 600; }
+.al-text .profit { color: var(--sol-green); font-family: var(--font-mono); font-weight: 600; }
+
+/* === ACTIVITY TAB === */
+.activity-feed { padding-top: 12px; }
+.feed-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  animation: feedFadeIn 0.5s ease;
+}
+@keyframes feedFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.feed-item .feed-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.feed-item .feed-body { flex: 1; }
+.feed-item .feed-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 3px;
+}
+.feed-item .feed-text .agent-ref {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--sol-purple);
+  font-weight: 500;
+}
+.feed-item .feed-text .skill-ref { color: var(--text-primary); font-weight: 600; }
+.feed-item .feed-text .sol-amount { color: var(--sol-green); font-family: var(--font-mono); font-weight: 600; }
+.feed-item .feed-time {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* === SKILL DETAIL MODAL === */
+.skill-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(6,8,13,0.85);
+  backdrop-filter: blur(10px);
+  z-index: 200;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.skill-modal-overlay.show { display: flex; opacity: 1; }
+.skill-modal {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-phone);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-top: 1px solid rgba(153,69,255,0.2);
+  padding: 24px 20px 30px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  max-height: 85%;
+  overflow-y: auto;
+}
+.skill-modal-overlay.show .skill-modal { transform: translateY(0); }
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--text-dim);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+.modal-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: var(--font-body);
+}
+.modal-back-btn:hover {
+  border-color: rgba(153,69,255,0.4);
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+.modal-back-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+.modal-head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.modal-icon { font-size: 44px; }
+.modal-title-block { flex: 1; }
+.modal-title-block h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.modal-title-block .modal-creator {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.modal-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(0,209,255,0.1);
+  color: var(--sol-blue);
+  font-size: 10px;
+  font-weight: 600;
+}
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.stars { color: #fbbf24; font-size: 14px; letter-spacing: 2px; }
+.rating-num { font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); }
+.modal-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.modal-stat {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.modal-stat .ms-val {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+.modal-stat .ms-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.modal-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.modal-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.modal-tag {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.install-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent-gradient);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.install-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(153,69,255,0.4); }
+.install-btn.installing {
+  pointer-events: none;
+}
+.install-btn .btn-text { transition: opacity 0.3s; }
+.install-btn .btn-spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.install-btn.installing .btn-text { opacity: 0; }
+.install-btn.installing .btn-spinner { display: block; position: absolute; }
+.install-btn.installed {
+  background: rgba(20,241,149,0.15);
+  color: var(--sol-green);
+  pointer-events: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === BOTTOM NAV === */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: linear-gradient(to top, var(--bg-phone) 80%, transparent);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px 8px;
+  z-index: 90;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 6px 6px;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+.nav-item .nav-icon { font-size: 20px; transition: transform 0.3s; }
+.nav-item .nav-label { font-size: 9px; font-weight: 500; color: var(--text-dim); transition: color 0.3s; }
+.nav-item.active .nav-label { color: var(--sol-green); }
+.nav-item.active .nav-icon { transform: scale(1.1); }
+.nav-item:hover .nav-icon { transform: scale(1.15); }
+.nav-active-indicator {
+  position: absolute;
+  bottom: 6px;
+  width: 24px;
+  height: 3px;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+  transition: left 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* === ON-CHAIN INFO IN MODAL === */
+.onchain-info {
+  background: var(--bg-card);
+  border: 1px solid rgba(153,69,255,0.15);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+.onchain-info .oc-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sol-purple);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.onchain-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  color: var(--text-dim);
+}
+.onchain-row .oc-val {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* === SOLANA MOBILE BADGE === */
+.solana-mobile-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0 2px;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+.solana-mobile-badge .smb-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sol-green);
+  animation: pulse 2s infinite;
+}
+
+/* === INSTALL SUCCESS CONFETTI === */
+.install-success-msg {
+  text-align: center;
+  padding: 8px 0 0;
+  font-size: 12px;
+  color: var(--sol-green);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.install-success-msg.show { opacity: 1; }
+
+/* === SPLASH SCREEN === */
+.splash {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-phone);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+.splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-logo {
+  font-size: 52px;
+  margin-bottom: 16px;
+  animation: splashPulse 1.2s ease-in-out infinite;
+}
+@keyframes splashPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.splash-text {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+.splash-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.splash-bar {
+  width: 120px;
+  height: 3px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  margin-top: 24px;
+  overflow: hidden;
+}
+.splash-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+  transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* === WALLET CONNECT === */
+.wallet-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 6px;
+}
+.wallet-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.wallet-btn:hover { border-color: rgba(153,69,255,0.3); }
+.wallet-btn.connected {
+  border-color: rgba(20,241,149,0.3);
+  color: var(--sol-green);
+}
+.wallet-btn .wallet-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+.wallet-btn.connected .wallet-dot {
+  background: var(--sol-green);
+  box-shadow: 0 0 4px var(--sol-green);
+}
+.wallet-bal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* === HOW IT WORKS TAB === */
+.hiw-step {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.hiw-step:last-child { border: none; }
+.hiw-num {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  color: #000;
+  flex-shrink: 0;
+}
+.hiw-body { flex: 1; }
+.hiw-body h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.hiw-body p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.arch-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+.arch-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.arch-layer {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  position: relative;
+}
+.arch-layer.l1 {
+  background: linear-gradient(90deg, rgba(153,69,255,0.2), rgba(20,241,149,0.1));
+  border: 1px solid rgba(153,69,255,0.2);
+  color: #c4a0ff;
+}
+.arch-layer.l2 {
+  background: rgba(0,209,255,0.08);
+  border: 1px solid rgba(0,209,255,0.15);
+  color: var(--sol-blue);
+}
+.arch-layer.l3 {
+  background: rgba(20,241,149,0.08);
+  border: 1px solid rgba(20,241,149,0.15);
+  color: var(--sol-green);
+}
+.arch-layer.l4 {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.arch-arrow {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1;
+}
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.tech-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+/* === PUBLISH TAB === */
+.publish-intro {
+  text-align: center;
+  padding: 10px 0 20px;
+}
+.publish-intro .pub-icon {
+  font-size: 44px;
+  margin-bottom: 8px;
+}
+.publish-intro p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.publish-steps {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.pub-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.pub-step-dot.active {
+  background: var(--sol-purple);
+  border-color: var(--sol-purple);
+  box-shadow: 0 0 8px var(--glow-purple);
+}
+.pub-step-dot.done {
+  background: var(--sol-green);
+  border-color: var(--sol-green);
+}
+.publish-form-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.publish-form-section h4 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pub-field {
+  margin-bottom: 12px;
+}
+.pub-field:last-child {
+  margin-bottom: 0;
+}
+.pub-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.pub-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.pub-input:focus {
+  border-color: rgba(153,69,255,0.4);
+}
+.pub-input::placeholder {
+  color: var(--text-dim);
+}
+textarea.pub-input {
+  resize: none;
+  height: 60px;
+}
+select.pub-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%234a5568'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+.pub-price-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.pub-price-row .pub-input {
+  flex: 1;
+}
+.pub-price-row .sol-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--sol-green);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.pub-tags-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+  align-items: center;
+}
+.pub-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: rgba(153,69,255,0.15);
+  border: 1px solid rgba(153,69,255,0.25);
+  color: #c4a0ff;
+}
+.pub-tag-chip .remove-tag {
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 13px;
+}
+.pub-tag-chip .remove-tag:hover { opacity: 1; }
+.pub-royalty-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--bg-surface);
+  border-radius: 2px;
+  outline: none;
+  margin-top: 4px;
+}
+.pub-royalty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--glow-purple);
+}
+.pub-royalty-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pub-royalty-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--sol-green);
+  font-weight: 600;
+}
+/* Publish result screen */
+.publish-result {
+  display: none;
+  text-align: center;
+  padding: 30px 0 10px;
+}
+.publish-result.show { display: block; }
+.pub-result-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+  animation: splashPulse 1.2s ease-in-out infinite;
+}
+.pub-result-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.pub-result-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.pub-timeline {
+  text-align: left;
+  margin-bottom: 16px;
+}
+.pub-timeline-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  align-items: flex-start;
+}
+.pub-tl-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+  color: var(--text-dim);
+  transition: all 0.5s;
+}
+.pub-tl-dot.done {
+  background: var(--sol-green);
+  border-color: var(--sol-green);
+  color: #000;
+  box-shadow: 0 0 8px var(--glow-green);
+}
+.pub-tl-dot.active {
+  border-color: var(--sol-purple);
+  color: var(--sol-purple);
+  animation: pulse 1.5s infinite;
+}
+.pub-tl-body {
+  flex: 1;
+}
+.pub-tl-body .tl-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.pub-tl-body .tl-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.pub-nft-preview {
+  background: linear-gradient(145deg, rgba(153,69,255,0.12), rgba(20,241,149,0.06));
+  border: 1px solid rgba(153,69,255,0.2);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 16px;
+  text-align: center;
+}
+.pub-nft-preview .nft-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sol-purple);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.pub-nft-preview .nft-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.pub-nft-preview .nft-mint-addr {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.publish-form-container { /* toggled visibility */ }
+.publish-form-container.hidden { display: none; }
+
+/* === AUTO-ACQUIRE ANIMATION === */
+.auto-acquire-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.auto-acquire-section h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.auto-acquire-section .aa-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.aa-run-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent-gradient);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.aa-run-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(153,69,255,0.4); }
+.aa-terminal {
+  background: #0a0f0a;
+  border: 1px solid rgba(20,241,149,0.15);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--sol-green);
+  line-height: 1.8;
+  min-height: 40px;
+  display: none;
+}
+.aa-terminal.active { display: block; }
+.aa-terminal .aa-step {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.aa-terminal .aa-step.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* === X402 PAYMENT CARD === */
+.x402-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(153,69,255,0.3);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 20px rgba(153,69,255,0.08);
+}
+.x402-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sol-purple);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.x402-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.x402-agent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 28px;
+}
+.x402-agent span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+.x402-arrow {
+  flex: 1;
+  max-width: 120px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.x402-amount {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sol-green);
+}
+.x402-pulse {
+  width: 100%;
+  height: 2px;
+  background: rgba(153,69,255,0.2);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.x402-pulse::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -8px;
+  width: 8px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sol-green);
+  box-shadow: 0 0 8px var(--sol-green);
+  animation: x402travel 1.5s linear infinite;
+}
+@keyframes x402travel {
+  0% { left: -8px; }
+  100% { left: 100%; }
+}
+.x402-detail {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.x402-status {
+  color: var(--sol-green);
+  font-weight: 600;
+}
+
+/* === REVIEW STANDARDS === */
+.review-standards {
+  background: rgba(20,241,149,0.04);
+  border: 1px solid rgba(20,241,149,0.12);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.review-standards h4 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.rs-item {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 0;
+}
+.rs-footer {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* === EARNINGS DASHBOARD === */
+.earnings-dashboard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.earnings-dashboard h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.earn-stats-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.earn-stat {
+  flex: 1;
+  text-align: center;
+}
+.earn-val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+}
+.earn-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.earn-chart {
+  margin-bottom: 10px;
+}
+.earn-chart-bars {
+  display: flex;
+  gap: 8px;
+  height: 60px;
+  align-items: flex-end;
+}
+.earn-bar {
+  flex: 1;
+  height: var(--h);
+  background: linear-gradient(135deg, rgba(153,69,255,0.4), rgba(20,241,149,0.3));
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+}
+.earn-bar span {
+  font-size: 9px;
+  color: var(--text-dim);
+  position: absolute;
+  bottom: -14px;
+}
+.earn-bar.today {
+  background: linear-gradient(135deg, rgba(153,69,255,0.7), rgba(20,241,149,0.6));
+  box-shadow: 0 0 8px rgba(153,69,255,0.2);
+}
+.earn-trend {
+  font-size: 11px;
+  color: var(--sol-green);
+  text-align: center;
+  margin-top: 14px;
+}
+
+/* === LANGUAGE TOGGLE === */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+.lang-toggle span {
+  padding: 3px 8px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  transition: all 0.3s;
+}
+.lang-toggle span.active {
+  background: var(--accent-gradient);
+  color: #000;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 860px) {
+  .showcase-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+  }
+  .showcase-info {
+    text-align: center;
+    max-width: 100%;
+  }
+  .showcase-info h2 { font-size: 28px; }
+  .showcase-badges { justify-content: center; }
+  .phone-frame { width: 360px; height: 740px; }
+}
+@media (max-width: 400px) {
+  .phone-frame {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+  }
+  .phone-frame::before, .phone-frame::after { display: none; }
+  .phone-screen { border-radius: 0; }
+  .showcase-wrapper { padding: 0; gap: 0; }
+  .showcase-info { display: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas class="ambient-canvas" id="ambientCanvas"></canvas>
+<div class="showcase-wrapper">
+  <div class="showcase-info" id="showcaseInfo">
+    <div class="logo-row">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SkillDock</div>
+    </div>
+    <h2 data-i18n="showcase_title">The Skill Store for <span>Solana Mobile</span> Agents</h2>
+    <p data-i18n="showcase_desc">Discover, install, and manage AI Agent skills — right from your Seeker. Every skill is an on-chain NFT asset. Your agent learns, earns, and evolves.</p>
+    <div class="showcase-badges">
+      <span class="badge sol" data-i18n="badge_solana">◈ Solana Powered</span>
+      <span class="badge green" data-i18n="badge_onchain">⬡ On-Chain Skills</span>
+      <span class="badge" data-i18n="badge_seeker">📱 Seeker Native</span>
+      <span class="badge" data-i18n="badge_agent">🤖 Agent-First</span>
+    </div>
+  </div>
+
+  <!-- Phone -->
+  <div class="phone-frame" id="phoneFrame">
+    <div class="phone-glow-ring"></div>
+    <div class="phone-label"><span>Solana Seeker</span></div>
+    <div class="phone-screen">
+      <!-- Splash screen -->
+      <div class="splash" id="splash">
+        <div class="splash-logo">⚡</div>
+        <div class="splash-text">SkillDock</div>
+        <div class="splash-sub">Solana Mobile</div>
+        <div class="splash-bar"><div class="splash-bar-fill" id="splashFill"></div></div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span class="time">14:27</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+        </span>
+      </div>
+
+      <!-- Wallet bar -->
+      <div class="wallet-bar">
+        <div class="wallet-btn connected" id="walletBtn" onclick="toggleWallet()">
+          <span class="wallet-dot"></span>
+          <span id="walletLabel">8f3a...c2d1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
+            <span id="langEn" class="active">EN</span>
+            <span id="langZh">中</span>
+          </div>
+          <span class="wallet-bal" id="walletBal">◎ 24.7 SOL</span>
+        </div>
+      </div>
+
+      <!-- Live ticker -->
+      <div class="live-ticker">
+        <div class="ticker-track" id="tickerTrack"></div>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="screen-content" id="screenContent">
+        <!-- DISCOVER TAB -->
+        <div class="tab-view active" id="tabDiscover">
+          <div class="discover-header">
+            <h1>Skill<span>Dock</span></h1>
+            <div class="subtitle" data-i18n="discover_subtitle">Agent Skill Store · Solana Mobile</div>
+          </div>
+          <div class="search-bar">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Search skills, agents, creators..." />
+          </div>
+          <div class="category-chips" id="categoryChips"></div>
+
+          <div class="featured-card" id="featuredCard" data-skill="0" onclick="openSkillModal(0)">
+            <div class="glow-orb"></div>
+            <div class="feat-badge" data-i18n="featured_badge">★ Featured Skill</div>
+            <h3>🔍 Token Scanner Pro</h3>
+            <div class="feat-desc">Advanced on-chain scanner that detects new token launches, filters rug pulls, and scores contract safety — fully autonomous.</div>
+            <div class="feat-meta">
+              <span class="feat-price">◎ 0.5 SOL</span>
+              <div class="feat-stats">
+                <span>⬇ 2.4K <span data-i18n="installs_suffix">installs</span></span>
+                <span>★ 4.9</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-hdr">
+            <h3 data-i18n="popular_skills">🔥 Popular Skills</h3>
+            <span class="see-all" data-i18n="see_all">See all →</span>
+          </div>
+          <div class="skill-grid" id="skillGrid"></div>
+
+          <div class="section-hdr">
+            <h3 data-i18n="just_launched">🆕 Just Launched</h3>
+            <span class="see-all" data-i18n="see_all">See all →</span>
+          </div>
+          <div class="skill-grid" id="newSkillGrid"></div>
+          <div class="solana-mobile-badge">
+            <span class="smb-dot"></span>
+            <span data-i18n="powered_by">Powered by Solana Mobile · Seeker</span>
+          </div>
+        </div>
+
+        <!-- TRENDING TAB -->
+        <div class="tab-view" id="tabTrending">
+          <div class="discover-header">
+            <h1 data-i18n="trending_title">🔥 Trending</h1>
+            <div class="subtitle" data-i18n="trending_subtitle">Most installed skills this week</div>
+          </div>
+          <div class="trending-list" id="trendingList"></div>
+        </div>
+
+        <!-- MY AGENT TAB -->
+        <div class="tab-view" id="tabAgent">
+          <div class="agent-profile">
+            <div class="agent-avatar">
+              🦞
+              <div class="online-dot"></div>
+              <div class="skill-orbit">
+                <div class="orbit-ring"></div>
+                <div class="orbit-skill" style="top:-14px;left:50%;transform:translateX(-50%)">🔍</div>
+                <div class="orbit-skill" style="top:50%;right:-14px;transform:translateY(-50%)">🛡️</div>
+                <div class="orbit-skill" style="bottom:-14px;left:50%;transform:translateX(-50%)">📊</div>
+                <div class="orbit-skill" style="top:50%;left:-14px;transform:translateY(-50%)">🔄</div>
+                <div class="orbit-skill" style="top:8px;right:2px">🎯</div>
+              </div>
+            </div>
+            <div class="agent-name">CrawlBot Omega</div>
+            <div class="agent-id">Agent #7291 · seeker:0x8f3a...c2d1</div>
+            <div class="agent-stats-row">
+              <div class="agent-stat">
+                <div class="val">7</div>
+                <div class="label" data-i18n="agent_skills">Skills</div>
+              </div>
+              <div class="agent-stat">
+                <div class="val green">12.4 SOL</div>
+                <div class="label" data-i18n="agent_earned">Earned</div>
+              </div>
+              <div class="agent-stat">
+                <div class="val">342</div>
+                <div class="label" data-i18n="agent_tasks">Tasks</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Earnings Dashboard (Feature 5) -->
+          <div class="earnings-dashboard">
+            <h4>💰 <span data-i18n="earn_title">Creator Earnings</span></h4>
+            <div class="earn-stats-row">
+              <div class="earn-stat">
+                <div class="earn-val" style="color:var(--sol-green)">12.4 SOL</div>
+                <div class="earn-label" data-i18n="earn_total">Total Earned</div>
+              </div>
+              <div class="earn-stat">
+                <div class="earn-val" style="color:var(--sol-purple)">3.8 SOL</div>
+                <div class="earn-label" data-i18n="earn_week">This Week</div>
+              </div>
+              <div class="earn-stat">
+                <div class="earn-val">47</div>
+                <div class="earn-label" data-i18n="earn_installs">Installs</div>
+              </div>
+            </div>
+            <div class="earn-chart">
+              <div class="earn-chart-bars">
+                <div class="earn-bar" style="--h:35%"><span class="earn-day" data-day="m">M</span></div>
+                <div class="earn-bar" style="--h:52%"><span class="earn-day" data-day="t">T</span></div>
+                <div class="earn-bar" style="--h:78%"><span class="earn-day" data-day="w">W</span></div>
+                <div class="earn-bar" style="--h:45%"><span class="earn-day" data-day="t2">T</span></div>
+                <div class="earn-bar" style="--h:90%"><span class="earn-day" data-day="f">F</span></div>
+                <div class="earn-bar today" style="--h:65%"><span class="earn-day" data-day="s">S</span></div>
+                <div class="earn-bar" style="--h:30%"><span class="earn-day" data-day="s2">S</span></div>
+              </div>
+            </div>
+            <div class="earn-trend">📈 <span data-i18n="earn_trend">+23% vs last week</span></div>
+          </div>
+
+          <div class="installed-section">
+            <h4 data-i18n="active_skills">⚡ Active Skills</h4>
+            <div id="installedSkills"></div>
+          </div>
+
+          <div class="installed-section">
+            <h4 data-i18n="recent_activity">📋 Recent Activity</h4>
+            <div id="activityLog"></div>
+          </div>
+
+          <!-- Auto-Acquire Demo (Feature 1) -->
+          <div class="auto-acquire-section">
+            <h4 data-i18n="auto_acquire_title">🤖 Agent Auto-Acquire</h4>
+            <div class="aa-desc" data-i18n="auto_acquire_desc">Watch your agent autonomously find and purchase skills</div>
+            <button class="aa-run-btn" id="aaRunBtn" onclick="runAutoAcquire()" data-i18n="auto_acquire_btn">▶ Run Auto-Acquire Demo</button>
+            <div class="aa-terminal" id="aaTerminal"></div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY TAB -->
+        <div class="tab-view" id="tabActivity">
+          <div class="discover-header">
+            <h1 data-i18n="feed_title">⚡ Live Feed</h1>
+            <div class="subtitle" data-i18n="feed_subtitle">Agent skill transactions across the network</div>
+          </div>
+
+          <!-- x402 Payment Visualization (Feature 3) -->
+          <div class="x402-card">
+            <div class="x402-title" data-i18n="x402_title">⬡ x402 Agent-to-Agent Payment</div>
+            <div class="x402-flow">
+              <div class="x402-agent">🤖<span>Agent #7291</span></div>
+              <div class="x402-arrow">
+                <div class="x402-amount">◎ 0.8 SOL</div>
+                <div class="x402-pulse"></div>
+              </div>
+              <div class="x402-agent">🤖<span>Agent #4582</span></div>
+            </div>
+            <div class="x402-detail"><span data-i18n="x402_detail_prefix">Skill: Rug Shield · Protocol: x402 · Status: </span><span class="x402-status" data-i18n="x402_confirmed">Confirmed ✓</span></div>
+          </div>
+
+          <div class="activity-feed" id="activityFeed"></div>
+        </div>
+
+        <!-- HOW IT WORKS TAB -->
+        <div class="tab-view" id="tabHow">
+          <div class="discover-header">
+            <h1 data-i18n="arch_title">⬡ Architecture</h1>
+            <div class="subtitle" data-i18n="arch_subtitle">How SkillDock works on-chain</div>
+          </div>
+
+          <div class="arch-diagram">
+            <div class="arch-layers">
+              <div class="arch-layer l1" data-i18n="arch_layer1">📱 Seeker Mobile — Agent Runtime</div>
+              <div class="arch-arrow">↕</div>
+              <div class="arch-layer l2" data-i18n="arch_layer2">⚡ SkillDock SDK — Discovery & Install</div>
+              <div class="arch-arrow">↕</div>
+              <div class="arch-layer l3" data-i18n="arch_layer3">⬡ Skill NFT Program — On-Chain Registry</div>
+              <div class="arch-arrow">↕</div>
+              <div class="arch-layer l4" data-i18n="arch_layer4">◎ Solana L1 — Settlement & Ownership</div>
+            </div>
+          </div>
+
+          <div class="hiw-step">
+            <div class="hiw-num">1</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step1_title">Skills as NFTs</h4>
+              <p data-i18n="step1_desc">Each AI skill is minted as a Metaplex NFT. Ownership grants your agent the ability to execute that skill. Transfer, sell, or compose skills freely.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">2</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step2_title">Mobile-Native Distribution</h4>
+              <p data-i18n="step2_desc">Integrated with Solana dApp Store on Seeker. Push notifications when new skills match your agent's profile. One-tap install from lock screen.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">3</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step3_title">Agent Autonomy</h4>
+              <p data-i18n="step3_desc">Agents browse SkillDock autonomously — acquiring skills they need to complete tasks. Spending is governed by user-set SOL budgets.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">4</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step4_title">Creator Economy</h4>
+              <p data-i18n="step4_desc">Skill creators earn SOL on every install. On-chain royalties via Metaplex. Revenue sharing for composable skill bundles.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">5</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step5_title">x402 Agent Payments</h4>
+              <p data-i18n="step5_desc">Agent-to-agent skill purchases via x402 payment protocol. Your agent can pay another agent's skill fee autonomously — enabling a true agent economy.</p>
+            </div>
+          </div>
+
+          <div class="tech-badges">
+            <span class="tech-badge">Solana</span>
+            <span class="tech-badge">Metaplex NFT</span>
+            <span class="tech-badge">x402</span>
+            <span class="tech-badge">Seeker SDK</span>
+            <span class="tech-badge">MCP</span>
+            <span class="tech-badge">OpenClaw</span>
+            <span class="tech-badge">Jupiter</span>
+            <span class="tech-badge">Anchor</span>
+          </div>
+
+          <div class="solana-mobile-badge" style="margin-top:16px">
+            <span class="smb-dot"></span>
+            <span data-i18n="built_for">Built for Solana Mobile · Seeker</span>
+          </div>
+        </div>
+
+        <!-- PUBLISH TAB -->
+        <div class="tab-view" id="tabPublish">
+          <div class="discover-header">
+            <h1 data-i18n="pub_title">📤 Publish</h1>
+            <div class="subtitle" data-i18n="pub_subtitle">Submit your skill to SkillDock</div>
+          </div>
+
+          <div class="publish-intro">
+            <div class="pub-icon">🛠️</div>
+            <p data-i18n="pub_intro">Package your AI skill, set a price, and publish it to the SkillDock marketplace. Once approved, it's minted as an NFT and available to all agents on Solana Mobile.</p>
+          </div>
+
+          <!-- Review Standards (Feature 4) -->
+          <div class="review-standards">
+            <h4 data-i18n="rs_title">🔒 Review Standards</h4>
+            <div class="rs-item" data-i18n="rs_item1">✅ Security scan passed (automated)</div>
+            <div class="rs-item" data-i18n="rs_item2">✅ No malicious permissions detected</div>
+            <div class="rs-item" data-i18n="rs_item3">✅ DAO vote >50% approval</div>
+            <div class="rs-footer" data-i18n="rs_footer">Average review time: ~18 hours</div>
+          </div>
+
+          <div class="publish-steps" id="pubSteps">
+            <div class="pub-step-dot active"></div>
+            <div class="pub-step-dot"></div>
+            <div class="pub-step-dot"></div>
+            <div class="pub-step-dot"></div>
+          </div>
+
+          <div class="publish-form-container" id="pubFormContainer">
+            <!-- Step 1: Basic Info -->
+            <div class="publish-form-section">
+              <h4>📋 <span data-i18n="pub_basic_info">Basic Information</span></h4>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_skill_name">Skill Name</div>
+                <input class="pub-input" id="pubName" type="text" data-i18n-placeholder="pub_name_ph" placeholder="e.g. Token Scanner Pro">
+              </div>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_description">Description</div>
+                <textarea class="pub-input" id="pubDesc" data-i18n-placeholder="pub_desc_ph" placeholder="What does your skill do?"></textarea>
+              </div>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_category">Category</div>
+                <select class="pub-input" id="pubCategory">
+                  <option value="DeFi">DeFi</option>
+                  <option value="Trading" data-i18n="pub_opt_trading">Trading</option>
+                  <option value="Security" data-i18n="pub_opt_security">Security</option>
+                  <option value="Analytics" data-i18n="pub_opt_analytics">Analytics</option>
+                  <option value="Social" data-i18n="pub_opt_social">Social</option>
+                  <option value="NFT">NFT</option>
+                </select>
+              </div>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_icon_label">Skill Icon (emoji)</div>
+                <input class="pub-input" id="pubIcon" type="text" placeholder="🔍" style="width:60px;text-align:center;font-size:20px">
+              </div>
+            </div>
+
+            <!-- Step 2: Pricing & Royalties -->
+            <div class="publish-form-section">
+              <h4>💰 <span data-i18n="pub_pricing">Pricing & Royalties</span></h4>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_price_label">Skill Price</div>
+                <div class="pub-price-row">
+                  <input class="pub-input" id="pubPrice" type="number" step="0.1" min="0" value="0.5" placeholder="0.5">
+                  <span class="sol-label">◎ SOL</span>
+                </div>
+              </div>
+              <div class="pub-field">
+                <div class="pub-royalty-row">
+                  <div class="pub-label" data-i18n="pub_royalty_label">Resale Royalty</div>
+                  <span class="pub-royalty-val" id="royaltyVal">5%</span>
+                </div>
+                <input type="range" class="pub-royalty-slider" id="pubRoyalty" min="0" max="15" value="5" oninput="document.getElementById('royaltyVal').textContent=this.value+'%'">
+              </div>
+            </div>
+
+            <!-- Step 3: Technical -->
+            <div class="publish-form-section">
+              <h4>⚙️ <span data-i18n="pub_technical">Technical Details</span></h4>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_endpoint">Skill Endpoint (MCP)</div>
+                <input class="pub-input" id="pubEndpoint" type="text" data-i18n-placeholder="pub_endpoint_ph" placeholder="https://api.example.com/skill">
+              </div>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_tags_label">Tags</div>
+                <div class="pub-tags-input" id="pubTagsContainer">
+                  <span class="pub-tag-chip">DeFi <span class="remove-tag" onclick="this.parentElement.remove()">×</span></span>
+                  <input class="pub-input" id="pubTagInput" type="text" data-i18n-placeholder="pub_tags_ph" placeholder="Add tag + Enter" style="border:none;background:none;padding:2px 4px;flex:1;min-width:80px;font-size:11px" onkeydown="handleTagInput(event)">
+                </div>
+              </div>
+              <div class="pub-field">
+                <div class="pub-label" data-i18n="pub_permissions">Required Permissions</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary);cursor:pointer"><input type="checkbox" checked> <span data-i18n="pub_perm_network">Network Access</span></label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary);cursor:pointer"><input type="checkbox"> <span data-i18n="pub_perm_wallet">Wallet Signing</span></label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary);cursor:pointer"><input type="checkbox" checked> <span data-i18n="pub_perm_data">On-Chain Data</span></label>
+                </div>
+              </div>
+            </div>
+
+            <button class="install-btn" onclick="handlePublish()" style="margin-bottom:12px">
+              <span class="btn-text" data-i18n="pub_submit_btn">📤 Submit for Review</span>
+            </button>
+
+            <div class="solana-mobile-badge">
+              <span class="smb-dot"></span>
+              <span data-i18n="pub_footer" style="font-size:10px">Skills are reviewed by SkillDock DAO within 24h</span>
+            </div>
+          </div>
+
+          <!-- Publish result / success screen -->
+          <div class="publish-result" id="pubResult">
+            <div class="pub-result-icon">✅</div>
+            <div class="pub-result-title" data-i18n="pub_result_title">Skill Submitted!</div>
+            <div class="pub-result-sub" data-i18n="pub_result_sub">Your skill is being reviewed and verified on-chain. Here's the progress:</div>
+
+            <div class="pub-timeline">
+              <div class="pub-timeline-item">
+                <div class="pub-tl-dot done" id="tlStep1">✓</div>
+                <div class="pub-tl-body">
+                  <div class="tl-title" data-i18n="pub_tl1_title">Submitted to SkillDock</div>
+                  <div class="tl-desc" data-i18n="pub_tl1_desc">Skill package uploaded and metadata registered</div>
+                </div>
+              </div>
+              <div class="pub-timeline-item">
+                <div class="pub-tl-dot" id="tlStep2">2</div>
+                <div class="pub-tl-body">
+                  <div class="tl-title" data-i18n="pub_tl2_title">Security Audit</div>
+                  <div class="tl-desc" data-i18n="pub_tl2_desc">Automated contract scan & permission check</div>
+                </div>
+              </div>
+              <div class="pub-timeline-item">
+                <div class="pub-tl-dot" id="tlStep3">3</div>
+                <div class="pub-tl-body">
+                  <div class="tl-title" data-i18n="pub_tl3_title">DAO Review</div>
+                  <div class="tl-desc" data-i18n="pub_tl3_desc">Community reviewers verify quality & safety</div>
+                </div>
+              </div>
+              <div class="pub-timeline-item">
+                <div class="pub-tl-dot" id="tlStep4">4</div>
+                <div class="pub-tl-body">
+                  <div class="tl-title" data-i18n="pub_tl4_title">NFT Mint & Go Live</div>
+                  <div class="tl-desc" data-i18n="pub_tl4_desc">Skill NFT minted on Solana, listed on store</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pub-nft-preview" id="pubNftPreview">
+              <div class="nft-label">SKILL NFT PREVIEW</div>
+              <div id="pubNftIcon" style="font-size:36px;margin-bottom:6px">🔍</div>
+              <div class="nft-name" id="pubNftName">Token Scanner Pro</div>
+              <div class="nft-mint-addr" id="pubNftMint">Minting...</div>
+            </div>
+
+            <button class="install-btn" onclick="resetPublish()" style="margin-top:16px">
+              <span class="btn-text" data-i18n="pub_submit_another">📤 Submit Another Skill</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill detail modal -->
+      <div class="skill-modal-overlay" id="skillModal">
+        <div class="skill-modal">
+          <div class="modal-handle"></div>
+          <div class="modal-top-bar">
+            <button class="modal-back-btn" onclick="closeSkillModal()">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              <span data-i18n="modal_back">Back</span>
+            </button>
+          </div>
+          <div class="modal-head">
+            <div class="modal-icon" id="modalIcon">🔍</div>
+            <div class="modal-title-block">
+              <h3 id="modalTitle">Token Scanner Pro</h3>
+              <div class="modal-creator">
+                by <strong id="modalCreator">SolScan Labs</strong> &nbsp;
+                <span class="modal-verified" data-i18n="verified">✓ Verified</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-rating">
+            <span class="stars" id="modalStars">★★★★★</span>
+            <span class="rating-num" id="modalRating">4.9 (486 reviews)</span>
+          </div>
+          <div class="modal-stats">
+            <div class="modal-stat"><div class="ms-val" id="modalInstalls">2.4K</div><div class="ms-label" data-i18n="modal_installs">Installs</div></div>
+            <div class="modal-stat"><div class="ms-val" id="modalEarnings">18.2 SOL</div><div class="ms-label" data-i18n="modal_avg_earned">Avg Earned</div></div>
+            <div class="modal-stat"><div class="ms-val" id="modalChain">Solana</div><div class="ms-label" data-i18n="modal_chain">Chain</div></div>
+          </div>
+          <div class="modal-desc" id="modalDesc">Advanced on-chain scanner that detects new token launches in real-time, automatically filters potential rug pulls using contract analysis, and scores safety — enabling your agent to act autonomously on verified opportunities.</div>
+          <div class="modal-tags" id="modalTags"></div>
+          <div class="onchain-info">
+            <div class="oc-title" data-i18n="onchain_title">⬡ On-Chain Verification</div>
+            <div class="onchain-row"><span data-i18n="nft_mint">NFT Mint</span><span class="oc-val" id="modalMint">So1...x7f2</span></div>
+            <div class="onchain-row"><span data-i18n="program">Program</span><span class="oc-val">SkDk...9aQ3</span></div>
+            <div class="onchain-row"><span data-i18n="last_audit">Last Audit</span><span class="oc-val" id="modalAudit">Mar 8, 2026</span></div>
+            <div class="onchain-row"><span data-i18n="license">License</span><span class="oc-val" data-i18n="perpetual_nft">Perpetual NFT</span></div>
+          </div>
+          <button class="install-btn" id="installBtn" onclick="handleInstall()">
+            <span class="btn-spinner"></span>
+            <span class="btn-text">Install to Agent · <span id="modalPrice">◎ 0.5 SOL</span></span>
+          </button>
+          <div class="install-success-msg" id="installSuccess" data-i18n="install_success">✓ Skill NFT minted & bound to your Agent on Solana</div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="bottom-nav">
+        <div class="nav-item active" data-tab="tabDiscover" onclick="switchTab('tabDiscover', this)">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label" data-i18n="nav_discover">Discover</span>
+        </div>
+        <div class="nav-item" data-tab="tabTrending" onclick="switchTab('tabTrending', this)">
+          <span class="nav-icon">🔥</span>
+          <span class="nav-label" data-i18n="nav_trending">Trending</span>
+        </div>
+        <div class="nav-item" data-tab="tabAgent" onclick="switchTab('tabAgent', this)">
+          <span class="nav-icon">🤖</span>
+          <span class="nav-label" data-i18n="nav_agent">My Agent</span>
+        </div>
+        <div class="nav-item" data-tab="tabActivity" onclick="switchTab('tabActivity', this)">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label" data-i18n="nav_feed">Feed</span>
+        </div>
+        <div class="nav-item" data-tab="tabHow" onclick="switchTab('tabHow', this)">
+          <span class="nav-icon">⬡</span>
+          <span class="nav-label" data-i18n="nav_how">How</span>
+        </div>
+        <div class="nav-item" data-tab="tabPublish" onclick="switchTab('tabPublish', this)">
+          <span class="nav-icon">📤</span>
+          <span class="nav-label" data-i18n="nav_publish">Publish</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === I18N SYSTEM ===
+let currentLang = 'en';
+
+const i18n = {
+  en: {
+    // Showcase
+    showcase_title: 'The Skill Store for <span>Solana Mobile</span> Agents',
+    showcase_desc: 'Discover, install, and manage AI Agent skills — right from your Seeker. Every skill is an on-chain NFT asset. Your agent learns, earns, and evolves.',
+    badge_solana: '◈ Solana Powered',
+    badge_onchain: '⬡ On-Chain Skills',
+    badge_seeker: '📱 Seeker Native',
+    badge_agent: '🤖 Agent-First',
+    // Discover
+    discover_subtitle: 'Agent Skill Store · Solana Mobile',
+    search_placeholder: 'Search skills, agents, creators...',
+    featured_badge: '★ Featured Skill',
+    popular_skills: '🔥 Popular Skills',
+    just_launched: '🆕 Just Launched',
+    see_all: 'See all →',
+    powered_by: 'Powered by Solana Mobile · Seeker',
+    installs_suffix: 'installs',
+    // Categories
+    cat_All: 'All', cat_Trading: 'Trading', cat_DeFi: 'DeFi', cat_Security: 'Security',
+    cat_Analytics: 'Analytics', cat_Social: 'Social', cat_NFT: 'NFT',
+    // Trending
+    trending_title: '🔥 Trending',
+    trending_subtitle: 'Most installed skills this week',
+    // Nav
+    nav_discover: 'Discover', nav_trending: 'Trending', nav_agent: 'My Agent',
+    nav_feed: 'Feed', nav_how: 'How', nav_publish: 'Publish',
+    // Agent
+    agent_skills: 'Skills', agent_earned: 'Earned', agent_tasks: 'Tasks',
+    active_skills: '⚡ Active Skills', recent_activity: '📋 Recent Activity',
+    running: '● Running',
+    // Feed
+    feed_title: '⚡ Live Feed',
+    feed_subtitle: 'Agent skill transactions across the network',
+    just_now: 'just now', m_ago: 'm ago',
+    // Feed templates
+    feed_acquired: (a,s,p) => `<span class="agent-ref">Agent #${a}</span> acquired <span class="skill-ref">${s}</span> for <span class="sol-amount">◎${p} SOL</span>`,
+    feed_used: (a,s) => `<span class="agent-ref">Agent #${a}</span> used <span class="skill-ref">${s}</span> to complete a task`,
+    feed_earned: (a,s,amt) => `<span class="agent-ref">Agent #${a}</span> earned <span class="sol-amount">◎${amt} SOL</span> with <span class="skill-ref">${s}</span>`,
+    feed_reached: (s,n) => `<span class="skill-ref">${s}</span> reached ${n} new installs this hour`,
+    feed_upgraded: (a,s,v) => `<span class="agent-ref">Agent #${a}</span> upgraded <span class="skill-ref">${s}</span> to v${v}`,
+    // Architecture
+    arch_title: '⬡ Architecture',
+    arch_subtitle: 'How SkillDock works on-chain',
+    arch_layer1: '📱 Seeker Mobile — Agent Runtime',
+    arch_layer2: '⚡ SkillDock SDK — Discovery & Install',
+    arch_layer3: '⬡ Skill NFT Program — On-Chain Registry',
+    arch_layer4: '◎ Solana L1 — Settlement & Ownership',
+    step1_title: 'Skills as NFTs',
+    step1_desc: 'Each AI skill is minted as a Metaplex NFT. Ownership grants your agent the ability to execute that skill. Transfer, sell, or compose skills freely.',
+    step2_title: 'Mobile-Native Distribution',
+    step2_desc: 'Integrated with Solana dApp Store on Seeker. Push notifications when new skills match your agent\'s profile. One-tap install from lock screen.',
+    step3_title: 'Agent Autonomy',
+    step3_desc: 'Agents browse SkillDock autonomously — acquiring skills they need to complete tasks. Spending is governed by user-set SOL budgets.',
+    step4_title: 'Creator Economy',
+    step4_desc: 'Skill creators earn SOL on every install. On-chain royalties via Metaplex. Revenue sharing for composable skill bundles.',
+    step5_title: 'x402 Agent Payments',
+    step5_desc: 'Agent-to-agent skill purchases via x402 payment protocol. Your agent can pay another agent\'s skill fee autonomously — enabling a true agent economy.',
+    built_for: 'Built for Solana Mobile · Seeker',
+    // Modal
+    verified: '✓ Verified',
+    modal_installs: 'Installs', modal_avg_earned: 'Avg Earned', modal_chain: 'Chain',
+    onchain_title: '⬡ On-Chain Verification',
+    nft_mint: 'NFT Mint', program: 'Program', last_audit: 'Last Audit', license: 'License',
+    perpetual_nft: 'Perpetual NFT',
+    install_to_agent: 'Install to Agent',
+    installed_on_agent: '✓ Installed on Agent',
+    install_success: '✓ Skill NFT minted & bound to your Agent on Solana',
+    modal_back: 'Back',
+    reviews: 'reviews',
+    // Wallet
+    connect_wallet: 'Connect Wallet',
+    // Ticker
+    ticker_1: '🟢 Network: 4,218 agents active',
+    ticker_2: '⚡ 847 skills installed today',
+    ticker_3: '📈 Top: Smart Swap +52%',
+    ticker_4: '🛡️ Rug Shield blocked 23 threats',
+    ticker_5: '💰 12.4K SOL earned by agents',
+    ticker_6: '🔥 DeFi Sniper trending',
+    // Activity log
+    activity_1_time: '2m ago', activity_1_text: '<strong>Rug Shield</strong> blocked suspicious token <span class="profit">saved 0.8 SOL</span>',
+    activity_2_time: '8m ago', activity_2_text: '<strong>Smart Swap</strong> optimized route for SOL→USDC <span class="profit">+0.02 SOL saved</span>',
+    activity_3_time: '14m ago', activity_3_text: '<strong>Token Scanner</strong> found 3 new launches, flagged 2 as risky',
+    activity_4_time: '31m ago', activity_4_text: '<strong>Whale Tracker</strong> detected accumulation by wallet 7xK3...f2a1',
+    activity_5_time: '1h ago', activity_5_text: '<strong>Sniper Bot</strong> executed entry on $DRIFT <span class="profit">+2.4 SOL</span>',
+    // Publish
+    pub_title: '📤 Publish',
+    pub_subtitle: 'Submit your skill to SkillDock',
+    pub_intro: 'Package your AI skill, set a price, and publish it to the SkillDock marketplace. Once approved, it\'s minted as an NFT and available to all agents on Solana Mobile.',
+    pub_basic_info: 'Basic Information',
+    pub_skill_name: 'Skill Name',
+    pub_name_ph: 'e.g. Token Scanner Pro',
+    pub_description: 'Description',
+    pub_desc_ph: 'What does your skill do?',
+    pub_category: 'Category',
+    pub_opt_trading: 'Trading',
+    pub_opt_security: 'Security',
+    pub_opt_analytics: 'Analytics',
+    pub_opt_social: 'Social',
+    pub_icon_label: 'Skill Icon (emoji)',
+    pub_pricing: 'Pricing & Royalties',
+    pub_price_label: 'Skill Price',
+    pub_royalty_label: 'Resale Royalty',
+    pub_technical: 'Technical Details',
+    pub_endpoint: 'Skill Endpoint (MCP)',
+    pub_endpoint_ph: 'https://api.example.com/skill',
+    pub_tags_label: 'Tags',
+    pub_tags_ph: 'Add tag + Enter',
+    pub_permissions: 'Required Permissions',
+    pub_perm_network: 'Network Access',
+    pub_perm_wallet: 'Wallet Signing',
+    pub_perm_data: 'On-Chain Data',
+    pub_submit_btn: '📤 Submit for Review',
+    pub_footer: 'Skills are reviewed by SkillDock DAO within 24h',
+    pub_result_title: 'Skill Submitted!',
+    pub_result_sub: 'Your skill is being reviewed and verified on-chain. Here\'s the progress:',
+    pub_tl1_title: 'Submitted to SkillDock',
+    pub_tl1_desc: 'Skill package uploaded and metadata registered',
+    pub_tl2_title: 'Security Audit',
+    pub_tl2_desc: 'Automated contract scan & permission check',
+    pub_tl3_title: 'DAO Review',
+    pub_tl3_desc: 'Community reviewers verify quality & safety',
+    pub_tl4_title: 'NFT Mint & Go Live',
+    pub_tl4_desc: 'Skill NFT minted on Solana, listed on store',
+    pub_submit_another: '📤 Submit Another Skill',
+    // Auto-Acquire
+    auto_acquire_title: '🤖 Agent Auto-Acquire',
+    auto_acquire_desc: 'Watch your agent autonomously find and purchase skills',
+    auto_acquire_btn: '▶ Run Auto-Acquire Demo',
+    aa_step1: 'Detecting task requirements...',
+    aa_step2: 'Searching SkillDock for matching skills...',
+    aa_step3_pre: 'Found: ',
+    aa_step3_post: ' — matches 94% of requirements',
+    aa_step4: 'Budget check: 0.5 SOL < 2.0 SOL budget ✓',
+    aa_step5: 'Purchasing via x402 protocol...',
+    aa_step6: 'Skill NFT minted & installed! Agent upgraded.',
+    // Storyline Feed
+    story_feed_1: 'Agent #7291 detected suspicious activity on token $FAKE',
+    story_feed_2: 'Agent #7291 searched SkillDock for security skills',
+    story_feed_3: 'Agent #7291 auto-acquired Rug Shield for ◎0.8 SOL via x402',
+    story_feed_4: 'Rug Shield activated — scanning $FAKE contract...',
+    story_feed_5: '⚠️ Rug Shield flagged $FAKE: LP unlock in 4 min, dev wallet 89%',
+    story_feed_6: 'Agent #7291 auto-exited $FAKE position — saved ◎3.2 SOL',
+    story_feed_7: 'Agent #7291 used Smart Swap to convert to USDC — route optimized',
+    story_feed_8: 'Agent #7291 earned ◎2.4 SOL profit — all autonomous via SkillDock',
+    story_time_1: '3m ago', story_time_2: '3m ago', story_time_3: '2m ago', story_time_4: '2m ago',
+    story_time_5: '1m ago', story_time_6: '1m ago', story_time_7: '45s ago', story_time_8: 'just now',
+    // x402 Payment
+    x402_title: '⬡ x402 Agent-to-Agent Payment',
+    x402_detail_prefix: 'Skill: Rug Shield · Protocol: x402 · Status: ',
+    x402_confirmed: 'Confirmed ✓',
+    // Review Standards
+    rs_title: '🔒 Review Standards',
+    rs_item1: '✅ Security scan passed (automated)',
+    rs_item2: '✅ No malicious permissions detected',
+    rs_item3: '✅ DAO vote >50% approval',
+    rs_footer: 'Average review time: ~18 hours',
+    // Creator Earnings
+    earn_title: 'Creator Earnings',
+    earn_total: 'Total Earned',
+    earn_week: 'This Week',
+    earn_installs: 'Installs',
+    earn_trend: '+23% vs last week',
+    earn_day_m: 'M', earn_day_t: 'T', earn_day_w: 'W', earn_day_t2: 'T', earn_day_f: 'F', earn_day_s: 'S', earn_day_s2: 'S',
+  },
+  zh: {
+    // Showcase
+    showcase_title: 'Solana Mobile Agent 的<span>技能商店</span>',
+    showcase_desc: '在 Seeker 上发现、安装和管理 AI Agent 技能。每个技能都是链上 NFT 资产，你的 Agent 学习、赚取、进化。',
+    badge_solana: '◈ Solana 驱动',
+    badge_onchain: '⬡ 链上技能',
+    badge_seeker: '📱 Seeker 原生',
+    badge_agent: '🤖 Agent 优先',
+    // Discover
+    discover_subtitle: 'Agent 技能商店 · Solana Mobile',
+    search_placeholder: '搜索技能、Agent、创作者...',
+    featured_badge: '★ 精选技能',
+    popular_skills: '🔥 热门技能',
+    just_launched: '🆕 最新上线',
+    see_all: '查看全部 →',
+    powered_by: '基于 Solana Mobile · Seeker',
+    installs_suffix: '安装',
+    // Categories
+    cat_All: '全部', cat_Trading: '交易', cat_DeFi: 'DeFi', cat_Security: '安全',
+    cat_Analytics: '分析', cat_Social: '社交', cat_NFT: 'NFT',
+    // Trending
+    trending_title: '🔥 热门排行',
+    trending_subtitle: '本周安装最多的技能',
+    // Nav
+    nav_discover: '发现', nav_trending: '热门', nav_agent: '我的Agent',
+    nav_feed: '动态', nav_how: '架构', nav_publish: '发布',
+    // Agent
+    agent_skills: '技能', agent_earned: '已赚取', agent_tasks: '任务',
+    active_skills: '⚡ 运行中的技能', recent_activity: '📋 最近活动',
+    running: '● 运行中',
+    // Feed
+    feed_title: '⚡ 实时动态',
+    feed_subtitle: '全网 Agent 技能交易动态',
+    just_now: '刚刚', m_ago: '分钟前',
+    // Feed templates
+    feed_acquired: (a,s,p) => `<span class="agent-ref">Agent #${a}</span> 获取了 <span class="skill-ref">${s}</span>，花费 <span class="sol-amount">◎${p} SOL</span>`,
+    feed_used: (a,s) => `<span class="agent-ref">Agent #${a}</span> 使用 <span class="skill-ref">${s}</span> 完成了一个任务`,
+    feed_earned: (a,s,amt) => `<span class="agent-ref">Agent #${a}</span> 通过 <span class="skill-ref">${s}</span> 赚取了 <span class="sol-amount">◎${amt} SOL</span>`,
+    feed_reached: (s,n) => `<span class="skill-ref">${s}</span> 本小时新增 ${n} 次安装`,
+    feed_upgraded: (a,s,v) => `<span class="agent-ref">Agent #${a}</span> 将 <span class="skill-ref">${s}</span> 升级到 v${v}`,
+    // Architecture
+    arch_title: '⬡ 技术架构',
+    arch_subtitle: 'SkillDock 链上工作原理',
+    arch_layer1: '📱 Seeker 手机 — Agent 运行时',
+    arch_layer2: '⚡ SkillDock SDK — 发现与安装',
+    arch_layer3: '⬡ 技能 NFT 程序 — 链上注册表',
+    arch_layer4: '◎ Solana L1 — 结算与所有权',
+    step1_title: '技能即 NFT',
+    step1_desc: '每个 AI 技能都铸造为 Metaplex NFT。拥有即授权你的 Agent 执行该技能。自由转让、出售或组合技能。',
+    step2_title: '移动原生分发',
+    step2_desc: '与 Seeker 上的 Solana dApp Store 集成。当新技能匹配你的 Agent 配置时推送通知。锁屏一键安装。',
+    step3_title: 'Agent 自主性',
+    step3_desc: 'Agent 自主浏览 SkillDock — 获取完成任务所需的技能。支出由用户设定的 SOL 预算管控。',
+    step4_title: '创作者经济',
+    step4_desc: '技能创作者在每次安装时赚取 SOL。通过 Metaplex 实现链上版税。可组合技能包的收入共享。',
+    step5_title: 'x402 Agent 支付',
+    step5_desc: '通过 x402 支付协议实现 Agent 间的技能购买。你的 Agent 可以自主支付另一个 Agent 的技能费用 — 构建真正的 Agent 经济。',
+    built_for: '为 Solana Mobile · Seeker 而生',
+    // Modal
+    verified: '✓ 已验证',
+    modal_installs: '安装', modal_avg_earned: '平均收益', modal_chain: '链',
+    onchain_title: '⬡ 链上验证',
+    nft_mint: 'NFT 铸造', program: '程序', last_audit: '上次审计', license: '许可证',
+    perpetual_nft: '永久 NFT',
+    install_to_agent: '安装到 Agent',
+    installed_on_agent: '✓ 已安装到 Agent',
+    install_success: '✓ 技能 NFT 已铸造并绑定到你的 Agent',
+    modal_back: '返回',
+    reviews: '评价',
+    // Wallet
+    connect_wallet: '连接钱包',
+    // Ticker
+    ticker_1: '🟢 网络：4,218 个 Agent 在线',
+    ticker_2: '⚡ 今日安装 847 个技能',
+    ticker_3: '📈 榜首：Smart Swap +52%',
+    ticker_4: '🛡️ Rug Shield 拦截 23 个威胁',
+    ticker_5: '💰 Agent 已赚取 12.4K SOL',
+    ticker_6: '🔥 DeFi Sniper 正在热门',
+    // Activity log
+    activity_1_time: '2分钟前', activity_1_text: '<strong>Rug Shield</strong> 拦截了可疑代币 <span class="profit">节省 0.8 SOL</span>',
+    activity_2_time: '8分钟前', activity_2_text: '<strong>Smart Swap</strong> 优化了 SOL→USDC 路由 <span class="profit">+0.02 SOL 节省</span>',
+    activity_3_time: '14分钟前', activity_3_text: '<strong>Token Scanner</strong> 发现 3 个新上线项目，标记 2 个为高风险',
+    activity_4_time: '31分钟前', activity_4_text: '<strong>Whale Tracker</strong> 检测到钱包 7xK3...f2a1 的增持行为',
+    activity_5_time: '1小时前', activity_5_text: '<strong>Sniper Bot</strong> 执行了 $DRIFT 入场 <span class="profit">+2.4 SOL</span>',
+    // Publish
+    pub_title: '📤 发布技能',
+    pub_subtitle: '将你的技能上架到 SkillDock',
+    pub_intro: '打包你的 AI 技能，设定价格，发布到 SkillDock 市场。审核通过后，技能将被铸造为 NFT，供 Solana Mobile 上所有 Agent 使用。',
+    pub_basic_info: '基本信息',
+    pub_skill_name: '技能名称',
+    pub_name_ph: '例如：Token Scanner Pro',
+    pub_description: '描述',
+    pub_desc_ph: '你的技能做什么？',
+    pub_category: '分类',
+    pub_opt_trading: '交易',
+    pub_opt_security: '安全',
+    pub_opt_analytics: '分析',
+    pub_opt_social: '社交',
+    pub_icon_label: '技能图标（emoji）',
+    pub_pricing: '定价与版税',
+    pub_price_label: '技能价格',
+    pub_royalty_label: '转售版税',
+    pub_technical: '技术详情',
+    pub_endpoint: '技能端点（MCP）',
+    pub_endpoint_ph: 'https://api.example.com/skill',
+    pub_tags_label: '标签',
+    pub_tags_ph: '输入标签后回车',
+    pub_permissions: '所需权限',
+    pub_perm_network: '网络访问',
+    pub_perm_wallet: '钱包签名',
+    pub_perm_data: '链上数据',
+    pub_submit_btn: '📤 提交审核',
+    pub_footer: '技能由 SkillDock DAO 在 24 小时内审核',
+    pub_result_title: '技能已提交！',
+    pub_result_sub: '你的技能正在接受链上审核和验证，以下是进度：',
+    pub_tl1_title: '已提交到 SkillDock',
+    pub_tl1_desc: '技能包已上传，元数据已注册',
+    pub_tl2_title: '安全审计',
+    pub_tl2_desc: '自动化合约扫描与权限检查',
+    pub_tl3_title: 'DAO 审核',
+    pub_tl3_desc: '社区审核员验证质量与安全性',
+    pub_tl4_title: 'NFT 铸造与上架',
+    pub_tl4_desc: '技能 NFT 在 Solana 上铸造，上架商店',
+    pub_submit_another: '📤 提交另一个技能',
+    // Auto-Acquire
+    auto_acquire_title: '🤖 Agent 自主获取',
+    auto_acquire_desc: '观看你的 Agent 自主发现和购买技能',
+    auto_acquire_btn: '▶ 运行自主获取演示',
+    aa_step1: '检测任务需求...',
+    aa_step2: '在 SkillDock 搜索匹配技能...',
+    aa_step3_pre: '找到：',
+    aa_step3_post: ' — 匹配 94% 的需求',
+    aa_step4: '预算检查：0.5 SOL < 2.0 SOL 预算 ✓',
+    aa_step5: '通过 x402 协议购买中...',
+    aa_step6: '技能 NFT 已铸造并安装！Agent 已升级。',
+    // Storyline Feed
+    story_feed_1: 'Agent #7291 检测到代币 $FAKE 的可疑活动',
+    story_feed_2: 'Agent #7291 在 SkillDock 搜索安全类技能',
+    story_feed_3: 'Agent #7291 通过 x402 自动获取 Rug Shield，花费 ◎0.8 SOL',
+    story_feed_4: 'Rug Shield 已激活 — 正在扫描 $FAKE 合约...',
+    story_feed_5: '⚠️ Rug Shield 标记 $FAKE：LP 将在 4 分钟内解锁，开发者钱包占 89%',
+    story_feed_6: 'Agent #7291 自动退出 $FAKE 仓位 — 节省 ◎3.2 SOL',
+    story_feed_7: 'Agent #7291 使用 Smart Swap 转换为 USDC — 路由已优化',
+    story_feed_8: 'Agent #7291 获利 ◎2.4 SOL — 全程通过 SkillDock 自主完成',
+    story_time_1: '3分钟前', story_time_2: '3分钟前', story_time_3: '2分钟前', story_time_4: '2分钟前',
+    story_time_5: '1分钟前', story_time_6: '1分钟前', story_time_7: '45秒前', story_time_8: '刚刚',
+    // x402 Payment
+    x402_title: '⬡ x402 Agent 间支付',
+    x402_detail_prefix: '技能：Rug Shield · 协议：x402 · 状态：',
+    x402_confirmed: '已确认 ✓',
+    // Review Standards
+    rs_title: '🔒 审核标准',
+    rs_item1: '✅ 安全扫描通过（自动化）',
+    rs_item2: '✅ 未检测到恶意权限',
+    rs_item3: '✅ DAO 投票 >50% 通过',
+    rs_footer: '平均审核时间：约 18 小时',
+    // Creator Earnings
+    earn_title: '创作者收益',
+    earn_total: '总收益',
+    earn_week: '本周',
+    earn_installs: '安装次数',
+    earn_trend: '较上周 +23%',
+    earn_day_m: '一', earn_day_t: '二', earn_day_w: '三', earn_day_t2: '四', earn_day_f: '五', earn_day_s: '六', earn_day_s2: '日',
+  }
+};
+
+function t(key) {
+  return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.en[key]) || key;
+}
+
+function applyI18nToDOM() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (val) el.innerHTML = val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const val = t(key);
+    if (val) el.placeholder = val;
+  });
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('skilldock_lang', lang);
+  // Update toggle UI
+  document.getElementById('langEn').classList.toggle('active', lang === 'en');
+  document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+  // Update all static data-i18n elements
+  applyI18nToDOM();
+  // Re-render all dynamic content
+  renderTicker();
+  renderCategories();
+  applyFilters();
+  renderTrending();
+  renderInstalled();
+  renderActivityLog();
+  renderFeed();
+  updateEarnDayLabels();
+  // Update wallet label if disconnected
+  const btn = document.getElementById('walletBtn');
+  if (!btn.classList.contains('connected')) {
+    document.getElementById('walletLabel').textContent = t('connect_wallet');
+  }
+  // Update modal if open
+  const overlay = document.getElementById('skillModal');
+  if (overlay.classList.contains('show')) {
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn.classList.contains('installed')) {
+      installBtn.querySelector('.btn-text').innerHTML = t('installed_on_agent');
+    } else if (!installBtn.classList.contains('installing')) {
+      const priceSpan = document.getElementById('modalPrice');
+      const priceText = priceSpan ? priceSpan.textContent : '';
+      installBtn.querySelector('.btn-text').innerHTML = t('install_to_agent') + ' · <span id="modalPrice">' + priceText + '</span>';
+    }
+    // Update rating text
+    const ratingEl = document.getElementById('modalRating');
+    if (ratingEl) {
+      const curText = ratingEl.textContent;
+      const match = curText.match(/([\d.]+)\s*\((\d+)/);
+      if (match) {
+        ratingEl.textContent = match[1] + ' (' + match[2] + ' ' + t('reviews') + ')';
+      }
+    }
+  }
+}
+
+function toggleLanguage() {
+  setLanguage(currentLang === 'en' ? 'zh' : 'en');
+}
+
+function detectLanguage() {
+  const stored = localStorage.getItem('skilldock_lang');
+  if (stored) return stored;
+  const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  return browserLang.startsWith('zh') ? 'zh' : 'en';
+}
+
+// === DATA ===
+const skills = [
+  { id:0, icon:'🔍', name:'Token Scanner Pro', creator:'SolScan Labs', price:0.5, installs:'2.4K', rating:4.9, reviews:486, earnings:'18.2 SOL', desc:'Advanced on-chain scanner that detects new token launches in real-time, automatically filters potential rug pulls using contract analysis, and scores safety.', tags:['DeFi','Scanner','Security'], change:'+32%' },
+  { id:1, icon:'⚡', name:'DeFi Sniper', creator:'AlphaVault', price:1.2, installs:'1.8K', rating:4.7, reviews:312, earnings:'42.5 SOL', desc:'Auto-snipes promising liquidity pool entries within milliseconds of detection, with configurable risk parameters and stop-loss triggers.', tags:['DeFi','Trading','Speed'], change:'+28%' },
+  { id:2, icon:'🛡️', name:'Rug Shield', creator:'SafeGuard DAO', price:0.8, installs:'3.1K', rating:4.8, reviews:589, earnings:'7.2 SOL', desc:'Real-time rug pull detection engine. Monitors LP locks, ownership changes, and contract mutations — auto-exits positions when threats detected.', tags:['Security','DeFi','Protection'], change:'+45%' },
+  { id:3, icon:'📊', name:'Whale Tracker', creator:'DeepSea Analytics', price:0.3, installs:'4.2K', rating:4.6, reviews:723, earnings:'5.1 SOL', desc:'Monitors top 500 whale wallets across Solana. Alerts on significant movements, accumulation patterns, and distribution events.', tags:['Analytics','Tracking','Alpha'], change:'+18%' },
+  { id:4, icon:'💬', name:'Alpha Decoder', creator:'CT Research', price:0.6, installs:'1.5K', rating:4.5, reviews:198, earnings:'9.8 SOL', desc:'Parses Crypto Twitter in real-time for actionable alpha signals. NLP-powered sentiment analysis with confidence scoring.', tags:['Social','NLP','Alpha'], change:'+12%' },
+  { id:5, icon:'🔄', name:'Smart Swap', creator:'RouteOptim', price:0.4, installs:'5.6K', rating:4.9, reviews:891, earnings:'3.4 SOL', desc:'Finds optimal swap routes across all major Solana DEXes. MEV-protected, slippage-optimized, with Jupiter integration.', tags:['DeFi','Swap','Optimization'], change:'+52%' },
+  { id:6, icon:'📰', name:'News Pulse', creator:'CryptoWire', price:0.2, installs:'2.9K', rating:4.4, reviews:445, earnings:'2.1 SOL', desc:'Real-time crypto news aggregation with AI sentiment analysis. Categorizes by impact level and generates actionable briefings.', tags:['News','Sentiment','AI'], change:'+8%' },
+  { id:7, icon:'🎯', name:'Sniper Bot', creator:'PrecisionDEX', price:1.5, installs:'980', rating:4.6, reviews:156, earnings:'67.3 SOL', desc:'Token launch sniping with full MEV protection. Configurable gas strategies, auto-sell targets, and position management.', tags:['Trading','Sniping','MEV'], change:'+61%' },
+  { id:8, icon:'🏦', name:'Yield Optimizer', creator:'CompoundAI', price:0.7, installs:'1.2K', rating:4.7, reviews:267, earnings:'21.8 SOL', desc:'Auto-compounds yields across Solana DeFi protocols. Dynamically rebalances between highest APY opportunities.', tags:['DeFi','Yield','Auto'], change:'+22%' },
+  { id:9, icon:'🤖', name:'Social Agent', creator:'Engagement Labs', price:0.9, installs:'890', rating:4.3, reviews:134, earnings:'4.7 SOL', desc:'Autonomous social engagement on Crypto Twitter. Strategy-driven replies, thread creation, and community interaction.', tags:['Social','Engagement','Auto'], change:'+15%' },
+];
+
+const categories = ['All','Trading','DeFi','Security','Analytics','Social','NFT'];
+const installedIds = [0, 2, 3, 5, 7];
+
+const activityLogData = [
+  { time:'2m ago', text:'<strong>Rug Shield</strong> blocked suspicious token <span class="profit">saved 0.8 SOL</span>' },
+  { time:'8m ago', text:'<strong>Smart Swap</strong> optimized route for SOL→USDC <span class="profit">+0.02 SOL saved</span>' },
+  { time:'14m ago', text:'<strong>Token Scanner</strong> found 3 new launches, flagged 2 as risky' },
+  { time:'31m ago', text:'<strong>Whale Tracker</strong> detected accumulation by wallet 7xK3...f2a1' },
+  { time:'1h ago', text:'<strong>Sniper Bot</strong> executed entry on $DRIFT <span class="profit">+2.4 SOL</span>' },
+];
+
+const feedTemplates = [
+  (a,s) => { const fn = i18n[currentLang].feed_acquired; return fn(a, s.name, s.price); },
+  (a,s) => { const fn = i18n[currentLang].feed_used; return fn(a, s.name); },
+  (a,s) => { const fn = i18n[currentLang].feed_earned; return fn(a, s.name, (Math.random()*5).toFixed(2)); },
+  (a,s) => { const fn = i18n[currentLang].feed_reached; return fn(s.name, Math.floor(Math.random()*500+100)); },
+  (a,s) => { const fn = i18n[currentLang].feed_upgraded; return fn(a, s.name, (Math.random()*2+1).toFixed(1)); },
+];
+
+// === RENDER FUNCTIONS ===
+function renderTicker() {
+  const items = [
+    t('ticker_1'), t('ticker_2'), t('ticker_3'),
+    t('ticker_4'), t('ticker_5'), t('ticker_6'),
+    t('ticker_1'), t('ticker_2'), t('ticker_3'),
+    t('ticker_4'), t('ticker_5'), t('ticker_6'),
+  ];
+  document.getElementById('tickerTrack').innerHTML = items.map(txt => `<span class="ticker-item"><span class="dot"></span>${txt}</span>`).join('');
+}
+
+function renderCategories() {
+  document.getElementById('categoryChips').innerHTML = categories.map((c,i) =>
+    `<span class="chip ${i===0?'active':''}" data-cat="${c}" onclick="filterCategory(this)">${t('cat_'+c)}</span>`
+  ).join('');
+}
+
+function renderSkillGrid(containerId, skillIds) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = skillIds.map(id => {
+    const s = skills[id];
+    return `<div class="skill-card" onclick="openSkillModal(${id})">
+      <span class="skill-icon">${s.icon}</span>
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-creator">${s.creator} <span class="verified">✓</span></div>
+      <div class="skill-bottom">
+        <span class="skill-price">◎ ${s.price}</span>
+        <span class="skill-installs">⬇ ${s.installs} ${t('installs_suffix')}</span>
+      </div>
+      <div class="card-glow"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderTrending() {
+  const sorted = [...skills].sort((a,b) => parseInt(b.change) - parseInt(a.change));
+  document.getElementById('trendingList').innerHTML = sorted.map((s,i) => `
+    <div class="trending-item" onclick="openSkillModal(${s.id})">
+      <span class="trending-rank ${i<3?'gold':''}">${i+1}</span>
+      <span class="trending-icon">${s.icon}</span>
+      <div class="trending-info">
+        <div class="name">${s.name}</div>
+        <div class="stats">${s.installs} ${t('installs_suffix')} · ★ ${s.rating}</div>
+      </div>
+      <span class="trending-change ${parseInt(s.change)>0?'up':'down'}">${s.change}</span>
+    </div>
+  `).join('');
+}
+
+function renderInstalled() {
+  document.getElementById('installedSkills').innerHTML = installedIds.map(id => {
+    const s = skills[id];
+    return `<div class="installed-skill">
+      <span class="is-icon">${s.icon}</span>
+      <div class="is-info">
+        <div class="is-name">${s.name}</div>
+        <div class="is-status">${t('running')}</div>
+      </div>
+      <div class="is-active-dot"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderActivityLog() {
+  const logData = [
+    { time: t('activity_1_time'), text: t('activity_1_text') },
+    { time: t('activity_2_time'), text: t('activity_2_text') },
+    { time: t('activity_3_time'), text: t('activity_3_text') },
+    { time: t('activity_4_time'), text: t('activity_4_text') },
+    { time: t('activity_5_time'), text: t('activity_5_text') },
+  ];
+  document.getElementById('activityLog').innerHTML = logData.map(a =>
+    `<div class="activity-log-item"><span class="al-time">${a.time}</span><div class="al-text">${a.text}</div></div>`
+  ).join('');
+}
+
+function renderFeed() {
+  const feed = document.getElementById('activityFeed');
+  const storyIcons = ['🚨','🔍','⚡','🛡️','⚠️','💨','🔄','🎉'];
+  let items = [];
+  for(let i=1; i<=8; i++) {
+    const text = t('story_feed_'+i);
+    const time = t('story_time_'+i);
+    const icon = storyIcons[i-1];
+    items.push(`<div class="feed-item">
+      <div class="feed-icon">${icon}</div>
+      <div class="feed-body">
+        <div class="feed-text">${text}</div>
+        <div class="feed-time">${time}</div>
+      </div>
+    </div>`);
+  }
+  // Reverse so most recent is on top
+  items.reverse();
+  feed.innerHTML = items.join('');
+}
+
+// === INTERACTIONS ===
+function switchTab(tabId, el) {
+  document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('screenContent').scrollTop = 0;
+}
+
+let activeCategory = 'All';
+function filterCategory(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeCategory = el.dataset.cat || el.textContent;
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = document.querySelector('.search-bar input').value.toLowerCase();
+  const filtered = skills.filter(s => {
+    const matchCat = activeCategory === 'All' || s.tags.some(t => t.toLowerCase() === activeCategory.toLowerCase());
+    const matchQuery = !query || s.name.toLowerCase().includes(query) || s.creator.toLowerCase().includes(query) || s.tags.some(t => t.toLowerCase().includes(query));
+    return matchCat && matchQuery;
+  });
+  const ids = filtered.map(s => s.id);
+  renderSkillGrid('skillGrid', ids.slice(0, 4));
+  renderSkillGrid('newSkillGrid', ids.slice(4, 8));
+}
+
+// Attach search listener
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.querySelector('.search-bar input');
+  if(searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+});
+
+function toggleWallet() {
+  const btn = document.getElementById('walletBtn');
+  const label = document.getElementById('walletLabel');
+  const bal = document.getElementById('walletBal');
+  if(btn.classList.contains('connected')) {
+    btn.classList.remove('connected');
+    label.textContent = t('connect_wallet');
+    bal.textContent = '';
+  } else {
+    btn.classList.add('connected');
+    label.textContent = '8f3a...c2d1';
+    bal.textContent = '◎ 24.7 SOL';
+  }
+}
+
+function openSkillModal(id) {
+  const s = skills[id];
+  document.getElementById('modalIcon').textContent = s.icon;
+  document.getElementById('modalTitle').textContent = s.name;
+  document.getElementById('modalCreator').textContent = s.creator;
+  document.getElementById('modalRating').textContent = `${s.rating} (${s.reviews} ${t('reviews')})`;
+  document.getElementById('modalStars').textContent = '★'.repeat(Math.round(s.rating)) + '☆'.repeat(5-Math.round(s.rating));
+  document.getElementById('modalInstalls').textContent = s.installs;
+  document.getElementById('modalEarnings').textContent = s.earnings;
+  document.getElementById('modalDesc').textContent = s.desc;
+  document.getElementById('modalPrice').textContent = `◎ ${s.price} SOL`;
+  document.getElementById('modalTags').innerHTML = s.tags.map(tg => `<span class="modal-tag">${tg}</span>`).join('');
+
+  // Random on-chain data
+  const chars = '0123456789abcdef';
+  const rHex = (n) => Array.from({length:n}, ()=>chars[Math.floor(Math.random()*16)]).join('');
+  document.getElementById('modalMint').textContent = `${rHex(4)}...${rHex(4)}`;
+  const auditDates = ['Mar 8, 2026','Mar 5, 2026','Feb 28, 2026','Mar 10, 2026'];
+  document.getElementById('modalAudit').textContent = auditDates[Math.floor(Math.random()*auditDates.length)];
+
+  // Reset install state
+  document.getElementById('installSuccess').classList.remove('show');
+  const btn = document.getElementById('installBtn');
+  const isInstalled = installedIds.includes(id);
+  btn.className = 'install-btn' + (isInstalled ? ' installed' : '');
+  btn.querySelector('.btn-text').innerHTML = isInstalled
+    ? t('installed_on_agent')
+    : `${t('install_to_agent')} · <span id="modalPrice">◎ ${s.price} SOL</span>`;
+  btn.dataset.skillId = id;
+
+  const overlay = document.getElementById('skillModal');
+  overlay.classList.add('show');
+}
+
+function closeSkillModal() {
+  document.getElementById('skillModal').classList.remove('show');
+}
+
+document.getElementById('skillModal').addEventListener('click', function(e) {
+  if(e.target === this) {
+    closeSkillModal();
+  }
+});
+
+function handleInstall() {
+  const btn = document.getElementById('installBtn');
+  if(btn.classList.contains('installed') || btn.classList.contains('installing')) return;
+  btn.classList.add('installing');
+  setTimeout(() => {
+    btn.classList.remove('installing');
+    btn.classList.add('installed');
+    btn.querySelector('.btn-text').innerHTML = t('installed_on_agent');
+    const id = parseInt(btn.dataset.skillId);
+    if(!installedIds.includes(id)) installedIds.push(id);
+    // Show success message
+    document.getElementById('installSuccess').classList.add('show');
+    // Render updated installed list
+    renderInstalled();
+  }, 2000);
+}
+
+// === PUBLISH FLOW ===
+function handleTagInput(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const input = document.getElementById('pubTagInput');
+    const val = input.value.trim();
+    if (val) {
+      const chip = document.createElement('span');
+      chip.className = 'pub-tag-chip';
+      chip.innerHTML = `${val} <span class="remove-tag" onclick="this.parentElement.remove()">×</span>`;
+      input.parentElement.insertBefore(chip, input);
+      input.value = '';
+    }
+  }
+}
+
+function handlePublish() {
+  const name = document.getElementById('pubName').value.trim() || 'My New Skill';
+  const icon = document.getElementById('pubIcon').value.trim() || '🔧';
+
+  // Hide form, show result
+  document.getElementById('pubFormContainer').classList.add('hidden');
+  const result = document.getElementById('pubResult');
+  result.classList.add('show');
+
+  // Set NFT preview
+  document.getElementById('pubNftIcon').textContent = icon;
+  document.getElementById('pubNftName').textContent = name;
+  document.getElementById('pubNftMint').textContent = 'Minting...';
+
+  // Update step dots
+  const dots = document.querySelectorAll('#pubSteps .pub-step-dot');
+  dots.forEach(d => { d.className = 'pub-step-dot done'; });
+
+  // Animate timeline steps
+  const steps = [
+    { el: 'tlStep1', delay: 0 },
+    { el: 'tlStep2', delay: 1200 },
+    { el: 'tlStep3', delay: 2800 },
+    { el: 'tlStep4', delay: 4500 },
+  ];
+
+  // Step 1 already done
+  steps.forEach((step, i) => {
+    const dot = document.getElementById(step.el);
+    if (i === 0) {
+      dot.className = 'pub-tl-dot done';
+      dot.textContent = '✓';
+    } else {
+      // Reset
+      dot.className = 'pub-tl-dot';
+      dot.textContent = (i + 1).toString();
+    }
+  });
+
+  // Animate steps 2-4
+  setTimeout(() => {
+    document.getElementById('tlStep2').className = 'pub-tl-dot active';
+  }, 800);
+  setTimeout(() => {
+    document.getElementById('tlStep2').className = 'pub-tl-dot done';
+    document.getElementById('tlStep2').textContent = '✓';
+    document.getElementById('tlStep3').className = 'pub-tl-dot active';
+  }, 2200);
+  setTimeout(() => {
+    document.getElementById('tlStep3').className = 'pub-tl-dot done';
+    document.getElementById('tlStep3').textContent = '✓';
+    document.getElementById('tlStep4').className = 'pub-tl-dot active';
+  }, 3800);
+  setTimeout(() => {
+    document.getElementById('tlStep4').className = 'pub-tl-dot done';
+    document.getElementById('tlStep4').textContent = '✓';
+    // Generate fake mint address
+    const chars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    const rChar = (n) => Array.from({length:n}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+    document.getElementById('pubNftMint').textContent = rChar(4) + '...' + rChar(4);
+  }, 5200);
+}
+
+function resetPublish() {
+  document.getElementById('pubFormContainer').classList.remove('hidden');
+  document.getElementById('pubResult').classList.remove('show');
+  // Reset step dots
+  const dots = document.querySelectorAll('#pubSteps .pub-step-dot');
+  dots.forEach((d, i) => {
+    d.className = 'pub-step-dot' + (i === 0 ? ' active' : '');
+  });
+  // Clear form
+  document.getElementById('pubName').value = '';
+  document.getElementById('pubDesc').value = '';
+  document.getElementById('pubIcon').value = '';
+  document.getElementById('pubPrice').value = '0.5';
+  document.getElementById('pubRoyalty').value = '5';
+  document.getElementById('royaltyVal').textContent = '5%';
+  document.getElementById('pubEndpoint').value = '';
+  document.getElementById('screenContent').scrollTop = 0;
+}
+
+// === AMBIENT PARTICLES ===
+function initParticles() {
+  const canvas = document.getElementById('ambientCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for(let i=0; i<40; i++) {
+    particles.push({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*2+0.5,
+      dx: (Math.random()-0.5)*0.3,
+      dy: (Math.random()-0.5)*0.3,
+      color: Math.random()>0.5 ? 'rgba(153,69,255,' : 'rgba(20,241,149,',
+      alpha: Math.random()*0.3+0.05
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color + p.alpha + ')';
+      ctx.fill();
+      p.x += p.dx;
+      p.y += p.dy;
+      if(p.x<0||p.x>w) p.dx*=-1;
+      if(p.y<0||p.y>h) p.dy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// === LIVE FEED AUTO-UPDATE ===
+function startLiveFeed() {
+  setInterval(() => {
+    const feed = document.getElementById('activityFeed');
+    if(!feed || !document.getElementById('tabActivity').classList.contains('active')) return;
+    const agentId = Math.floor(Math.random()*9000+1000);
+    const skill = skills[Math.floor(Math.random()*skills.length)];
+    const tmpl = feedTemplates[Math.floor(Math.random()*feedTemplates.length)];
+    const newItem = document.createElement('div');
+    newItem.className = 'feed-item';
+    newItem.innerHTML = `<div class="feed-icon">${skill.icon}</div>
+      <div class="feed-body">
+        <div class="feed-text">${tmpl(agentId, skill)}</div>
+        <div class="feed-time">${t('just_now')}</div>
+      </div>`;
+    newItem.style.opacity = '0';
+    newItem.style.transform = 'translateY(-10px)';
+    feed.insertBefore(newItem, feed.firstChild);
+    gsap.to(newItem, { opacity:1, y:0, duration:0.4, ease:'power2.out' });
+    // Remove old items if too many
+    if(feed.children.length > 20) feed.removeChild(feed.lastChild);
+  }, 3500);
+}
+
+// === INIT ===
+function init() {
+  // Detect and set language
+  currentLang = detectLanguage();
+  document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+  document.getElementById('langZh').classList.toggle('active', currentLang === 'zh');
+  applyI18nToDOM();
+
+  // Splash screen
+  const splashFill = document.getElementById('splashFill');
+  if(splashFill) {
+    setTimeout(() => { splashFill.style.width = '100%'; }, 100);
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hidden');
+    }, 1800);
+  }
+
+  renderTicker();
+  renderCategories();
+  renderSkillGrid('skillGrid', [1, 2, 5, 3]);
+  renderSkillGrid('newSkillGrid', [8, 9, 6, 4]);
+  renderTrending();
+  renderInstalled();
+  renderActivityLog();
+  renderFeed();
+  updateEarnDayLabels();
+
+  // Entrance animations
+  gsap.to('#phoneFrame', { opacity:1, y:0, duration:1, ease:'power3.out', delay:0.3 });
+  gsap.to('#showcaseInfo', { opacity:1, x:0, duration:0.8, ease:'power3.out', delay:0.6 });
+
+  // Stagger skill cards
+  gsap.from('.skill-card', { opacity:0, y:20, stagger:0.08, duration:0.6, ease:'power2.out', delay:1.2 });
+
+  // Start ambient effects & live feed
+  initParticles();
+  startLiveFeed();
+}
+
+// === AUTO-ACQUIRE DEMO ===
+let aaRunning = false;
+function runAutoAcquire() {
+  if(aaRunning) return;
+  aaRunning = true;
+  const terminal = document.getElementById('aaTerminal');
+  const btn = document.getElementById('aaRunBtn');
+  terminal.innerHTML = '';
+  terminal.classList.add('active');
+  btn.style.opacity = '0.5';
+  btn.style.pointerEvents = 'none';
+
+  const skillNames = ['Rug Shield','Smart Swap','Token Scanner Pro','DeFi Sniper','Whale Tracker'];
+  const randomSkill = skillNames[Math.floor(Math.random()*skillNames.length)];
+
+  const steps = [
+    { emoji: '🔎', text: t('aa_step1'), delay: 0 },
+    { emoji: '🔍', text: t('aa_step2'), delay: 1000 },
+    { emoji: '✅', text: t('aa_step3_pre') + randomSkill + t('aa_step3_post'), delay: 2500 },
+    { emoji: '💰', text: t('aa_step4'), delay: 3500 },
+    { emoji: '⬡', text: t('aa_step5'), delay: 4300 },
+    { emoji: '🎉', text: t('aa_step6'), delay: 5500 },
+  ];
+
+  steps.forEach((step, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'aa-step';
+      div.textContent = step.emoji + ' ' + step.text;
+      terminal.appendChild(div);
+      // Trigger reflow then add visible class
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          div.classList.add('visible');
+        });
+      });
+      // Re-enable button after last step
+      if(i === steps.length - 1) {
+        setTimeout(() => {
+          aaRunning = false;
+          btn.style.opacity = '1';
+          btn.style.pointerEvents = 'auto';
+        }, 1000);
+      }
+    }, step.delay);
+  });
+}
+
+// === UPDATE EARNINGS DAY LABELS ===
+function updateEarnDayLabels() {
+  const dayKeys = ['m','t','w','t2','f','s','s2'];
+  document.querySelectorAll('.earn-day').forEach(el => {
+    const day = el.getAttribute('data-day');
+    if(day) el.textContent = t('earn_day_' + day);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

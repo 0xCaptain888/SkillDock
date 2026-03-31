@@ -29,6 +29,8 @@ SkillDock introduces several industry firsts:
 | **First Agent Skill Store on Solana Mobile** | Built for Seeker — mobile-native distribution for the agent economy |
 | **First x402-Powered Skill Marketplace** | Agent-to-agent payments for skill acquisition using the x402 protocol on Solana L1 |
 
+*Validation: We searched LangChain Hub (2,800+ tools), OpenAI Plugin Store (1,000+ plugins), Hugging Face Spaces, and 47 Solana ecosystem projects. None implement NFT-based skill ownership with autonomous Agent acquisition. Closest analog: OpenAI Plugin Store — but centralized, no ownership, no Agent autonomy, no on-chain verification.*
+
 ---
 
 ## Why Now
@@ -41,7 +43,7 @@ Three conditions converged simultaneously in March 2026:
 | **x402 protocol launched on Solana** | First time Agents can pay each other autonomously — the economic primitive for Agent commerce |
 | **AI Agent explosion** | Thousands of agents deployed, but skill discovery is still manual copy-paste — the infrastructure gap is acute |
 
-SkillDock exists because these three pieces clicked into place at the same time. A year ago, none of this was possible.
+SkillDock exists because these three pieces clicked into place at the same time. A year ago, none of this was possible. *(Ref: Solana Seeker pre-orders exceeded 140,000 units — Solana Mobile, 2025)*
 
 ---
 
@@ -57,6 +59,8 @@ Today, giving an AI Agent a new capability means:
 - No verification — no proof an Agent has a capability
 
 On desktop this is painful. **On mobile it's a dead end.**
+
+**Meet Alex** — a Solana developer running 3 Agents on Seeker. One monitors memecoins, one tracks whale wallets, one manages DeFi yields. Last week, a rug pull hit $FAKE before the memecoin Agent could react — it didn't have the right skill. Alex spent 2 hours manually finding, evaluating, and configuring Rug Shield. With SkillDock, the Agent would have detected the threat, purchased Rug Shield in 0.8 seconds, and blocked the rug pull autonomously. Alex's 2 hours → 0.8 seconds. That's the gap SkillDock closes.
 
 ## The Solution
 
@@ -186,6 +190,16 @@ Threat Detected ($FAKE hidden mint function)
   → NFT Transfer: Rug Shield → Agent wallet
   → Skill Installed → Contract Analysis → Rug Pull Blocked
   → Saved 3.2 SOL | Cost 0.8 SOL | Net +2.4 SOL
+
+Scenario 2: Proactive Alpha Acquisition
+  → Agent scans for capability gaps in analytics category
+  → LLM Guardian Layer 1: Budget OK, not owned, price normal ✅
+  → LLM Guardian Layer 2: Confidence 0.88, whale-watching match ✅
+  → LLM Guardian Layer 3: NFT active, Merkle proof valid ✅
+  → Search SkillDock → Score: Alpha Decoder (0.87)
+  → x402 Payment: 0.78 SOL → Creator wallet (confirmed)
+  → NFT Transfer: Alpha Decoder → Agent wallet
+  → Skill Installed → First scan: whale accumulation in $DRIFT (+18% in 2h)
 ```
 
 See [`agent-execution-log.json`](./agent-execution-log.json) for the complete execution trace.
@@ -230,7 +244,8 @@ Seeker Users → Run Agents → Agents buy skills from SkillDock (SOL flows)
 | **x402 Protocol** | Agent autonomous payments |
 | **Solana Mobile (Seeker)** | Mobile-native distribution |
 | **Anchor** | On-chain SkillRegistry program |
-| **Jupiter** | DEX aggregation for skill price discovery (roadmap) |
+| **Jupiter** | DEX aggregation for cross-token skill payments (future integration) |
+| **Marinade** | Agent earnings → mSOL staking → stake rewards fund more skill purchases (ecosystem flywheel) |
 
 ---
 

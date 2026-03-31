@@ -1,5 +1,16 @@
 # SAP-1: Skill Acquisition Protocol v1
 
+| Field | Value |
+|-------|-------|
+| **SDP** | 001 |
+| **Title** | Skill Acquisition Protocol |
+| **Status** | Draft |
+| **Category** | Standards Track — Core |
+| **Created** | 2026-03-31 |
+| **Author** | 0xCaptain888 (@0xCaptain888) |
+| **Requires** | Metaplex Token Standard, SPL Token, x402 Protocol |
+| **Implementation** | [SkillDock](https://github.com/0xCaptain888/SkillDock) |
+
 > The first open standard for AI Agent skill discovery, acquisition, and verification on Solana.
 
 ## Abstract
@@ -192,7 +203,7 @@ This enables a "skill sharing economy" where Agents can monetize their capabilit
 
 - Registry Program: `/contracts/skill-registry/`
 - Merkle Verifier: `/src/merkle-verifier.mjs`
-- Agent SDK: `/src/agent-sdk.mjs`
+- LLM Guardian: `/src/llm-guardian.mjs`
 - GitHub: https://github.com/0xCaptain888/SkillDock
 
 ## Security Considerations

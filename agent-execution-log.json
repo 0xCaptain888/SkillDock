@@ -1,48 +1,492 @@
 {
-  "agent": "SkillDock Agent #7291",
-  "wallet": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
+  "agent": "Agent #7291",
+  "name": "CrawBot Omega",
   "network": "solana-devnet",
-  "session": "2026-03-31T06:13:01.627Z",
-  "actions": [
+  "session": "2026-03-31T12:11:30.060Z",
+  "merkleRoot": "8b770f9923879f6e007e617aa8a92a12b8d1a649a2104a4fea5e0f2479fbb162",
+  "guardianEnabled": true,
+  "executionLog": [
     {
-      "time": "2026-03-31T06:12:58.866Z",
-      "action": "THREAT_DETECTED",
-      "detail": "$FAKE — hidden mint function"
+      "timestamp": "2026-03-31T12:11:25.533Z",
+      "elapsed": "0.0s",
+      "agent": "Agent #7291",
+      "action": "BOOT",
+      "detail": "Agent Agent #7291 initialized. Wallet funded: 2 SOL"
     },
     {
-      "time": "2026-03-31T06:13:00.899Z",
-      "action": "SKILL_ACQUIRED",
-      "skill": "Rug Shield",
-      "paymentTx": "2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf",
-      "nftTx": "4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ"
-    }
-  ],
-  "x402Payments": [
+      "timestamp": "2026-03-31T12:11:25.534Z",
+      "elapsed": "0.0s",
+      "agent": "Agent #7291",
+      "action": "BOOT",
+      "detail": "Priorities: security, defi, analytics"
+    },
     {
-      "type": "skill_purchase",
-      "from": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
-      "to": "BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn",
+      "timestamp": "2026-03-31T12:11:25.534Z",
+      "elapsed": "0.0s",
+      "agent": "Agent #7291",
+      "action": "MERKLE",
+      "detail": "Registry Merkle root loaded: 8b770f9923879f6e007e617aa8a92a12..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:25.534Z",
+      "elapsed": "0.0s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN",
+      "detail": "LLM Guardian activated — triple-layer verification enabled"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:25.836Z",
+      "elapsed": "0.3s",
+      "agent": "Agent #7291",
+      "action": "SCAN",
+      "detail": "Scanning mempool for new token launches..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:26.338Z",
+      "elapsed": "0.8s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Mempool scan via skilldock-mini (cost: 0.33x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:26.338Z",
+      "elapsed": "0.8s",
+      "agent": "Agent #7291",
+      "action": "SCAN",
+      "detail": "Detected 47 new tokens in last 1h. Analyzing contracts..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:26.839Z",
+      "elapsed": "1.3s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "CRITICAL: $FAKE (FaKe...9x2Q)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:26.840Z",
+      "elapsed": "1.3s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "Contract contains hidden mint() function callable by deployer. Total supply can be inflated without limit."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:26.840Z",
+      "elapsed": "1.3s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "Potential loss: 3.2 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.041Z",
+      "elapsed": "1.5s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Threat analysis via skilldock-pro (cost: 1x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.041Z",
+      "elapsed": "1.5s",
+      "agent": "Agent #7291",
+      "action": "SEARCH",
+      "detail": "Querying SkillDock for [rug-protection, rug-detection, auto-block]..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.342Z",
+      "elapsed": "1.8s",
+      "agent": "Agent #7291",
+      "action": "EVALUATE",
+      "detail": "Best match: \"Rug Shield\" — 1800 installs, ★4.8, 0.8 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.545Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "MERKLE",
+      "detail": "Metadata integrity verified for \"Rug Shield\" (proof: 3 steps)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.547Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L1",
+      "detail": "Deterministic Rules: PASS (1.00) — budget, blacklist, duplicate, price, reputation"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L2",
+      "detail": "LLM Evaluation:     PASS (0.82) — confidence 0.82, temp=0.1"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L3",
+      "detail": "On-Chain Verify:    PASS (1.00) — NFT active, Merkle proof, price match"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN",
+      "detail": "APPROVED: All 3 layers passed for \"Rug Shield\""
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Payment processing via skilldock-mini (cost: 0.33x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "x402",
+      "detail": "Payment: 0.8 SOL → Creator via x402 protocol",
+      "protocol": "x402",
       "amount": 0.8,
-      "skill": "Rug Shield",
-      "signature": "2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf",
-      "explorer": "https://explorer.solana.com/tx/2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf?cluster=devnet"
+      "currency": "SOL",
+      "from": "Agent #7291",
+      "to": "Creator:BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn"
     },
     {
-      "type": "agent_to_agent",
-      "from": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
-      "to": "BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn",
-      "amount": 0.78,
-      "skill": "Alpha Decoder",
-      "signature": "3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ",
-      "explorer": "https://explorer.solana.com/tx/3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ?cluster=devnet"
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "PURCHASE",
+      "detail": "Acquired \"Rug Shield\" NFT → transferred to agent wallet",
+      "skill": "Rug Shield",
+      "cost": 0.8,
+      "remainingBalance": "1.2000",
+      "merkleVerified": true,
+      "guardianApproved": true
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "INSTALL",
+      "detail": "\"Rug Shield\" → agent runtime. Verifying NFT ownership..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.548Z",
+      "elapsed": "2.0s",
+      "agent": "Agent #7291",
+      "action": "ACTIVATE",
+      "detail": "\"Rug Shield\" is now ACTIVE"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.749Z",
+      "elapsed": "2.2s",
+      "agent": "Agent #7291",
+      "action": "PROTECT",
+      "detail": "\"Rug Shield\" analyzing $FAKE..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.749Z",
+      "elapsed": "2.2s",
+      "agent": "Agent #7291",
+      "action": "PROTECT",
+      "detail": "Result: HIDDEN_MINT confirmed. Transaction BLOCKED."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:27.749Z",
+      "elapsed": "2.2s",
+      "agent": "Agent #7291",
+      "action": "RESULT",
+      "detail": "Saved 3.2 SOL | Cost 0.8 SOL | Net +2.4 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.150Z",
+      "elapsed": "2.6s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "HIGH: $SCAM (ScAm...4kL7)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.150Z",
+      "elapsed": "2.6s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "Transfer function contains sell restriction. Buy works but sell reverts for non-whitelisted addresses."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.150Z",
+      "elapsed": "2.6s",
+      "agent": "Agent #7291",
+      "action": "THREAT",
+      "detail": "Potential loss: 1.5 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.351Z",
+      "elapsed": "2.8s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Threat analysis via skilldock-pro (cost: 1x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.352Z",
+      "elapsed": "2.8s",
+      "agent": "Agent #7291",
+      "action": "SEARCH",
+      "detail": "Querying SkillDock for [mev-protection, sandwich-block, front-run-defense]..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.652Z",
+      "elapsed": "3.1s",
+      "agent": "Agent #7291",
+      "action": "EVALUATE",
+      "detail": "Best match: \"Snipe Guard\" — 940 installs, ★4.7, 0.65 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.852Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "MERKLE",
+      "detail": "Metadata integrity verified for \"Snipe Guard\" (proof: 3 steps)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L1",
+      "detail": "Deterministic Rules: PASS (1.00) — budget, blacklist, duplicate, price, reputation"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L2",
+      "detail": "LLM Evaluation:     PASS (0.98) — confidence 0.98, temp=0.1"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L3",
+      "detail": "On-Chain Verify:    PASS (1.00) — NFT active, Merkle proof, price match"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN",
+      "detail": "APPROVED: All 3 layers passed for \"Snipe Guard\""
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Payment processing via skilldock-mini (cost: 0.33x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.853Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "x402",
+      "detail": "Payment: 0.65 SOL → Creator via x402 protocol",
+      "protocol": "x402",
+      "amount": 0.65,
+      "currency": "SOL",
+      "from": "Agent #7291",
+      "to": "Creator:9kQ2rC4VwFdT3p7LjHn5YxMcKzA2JvB8NsE6WqR1uFpD"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.854Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "PURCHASE",
+      "detail": "Acquired \"Snipe Guard\" NFT → transferred to agent wallet",
+      "skill": "Snipe Guard",
+      "cost": 0.65,
+      "remainingBalance": "0.5500",
+      "merkleVerified": true,
+      "guardianApproved": true
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.854Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "INSTALL",
+      "detail": "\"Snipe Guard\" → agent runtime. Verifying NFT ownership..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:28.854Z",
+      "elapsed": "3.3s",
+      "agent": "Agent #7291",
+      "action": "ACTIVATE",
+      "detail": "\"Snipe Guard\" is now ACTIVE"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.054Z",
+      "elapsed": "3.5s",
+      "agent": "Agent #7291",
+      "action": "PROTECT",
+      "detail": "\"Snipe Guard\" analyzing $SCAM..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.055Z",
+      "elapsed": "3.5s",
+      "agent": "Agent #7291",
+      "action": "PROTECT",
+      "detail": "Result: HONEYPOT confirmed. Transaction BLOCKED."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.055Z",
+      "elapsed": "3.5s",
+      "agent": "Agent #7291",
+      "action": "RESULT",
+      "detail": "Saved 1.5 SOL | Cost 0.65 SOL | Net +0.8 SOL"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.456Z",
+      "elapsed": "3.9s",
+      "agent": "Agent #7291",
+      "action": "SCAN",
+      "detail": "Proactive: Alpha Signal Detection..."
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.456Z",
+      "elapsed": "3.9s",
+      "agent": "Agent #7291",
+      "action": "ROUTER",
+      "detail": "Skill search via skilldock-mini (cost: 0.33x)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.757Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "SEARCH",
+      "detail": "Found proactive skill: \"Alpha Decoder\" (0.78 SOL, ★4.6)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.757Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "EVALUATE",
+      "detail": "ROI analysis: 2.1 SOL/week average alpha signal value, cost 0.78 SOL → payback in <1 day"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.757Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "MERKLE",
+      "detail": "Metadata integrity verified for \"Alpha Decoder\" (proof: 3 steps)"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.758Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L1",
+      "detail": "Deterministic Rules: FAIL (0.83) — budget, blacklist, duplicate, price, reputation"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.758Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L2",
+      "detail": "LLM Evaluation:     FAIL (0.00) — confidence 0.00, temp=0.1"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.758Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN_L3",
+      "detail": "On-Chain Verify:    FAIL (0.00) — NFT active, Merkle proof, price match"
+    },
+    {
+      "timestamp": "2026-03-31T12:11:29.758Z",
+      "elapsed": "4.2s",
+      "agent": "Agent #7291",
+      "action": "GUARDIAN",
+      "detail": "BLOCKED: Blocked at Layer 1 (Deterministic Rules)."
     }
   ],
   "acquiredSkills": [
-    "Rug Shield"
+    {
+      "id": "sk-rug-shield",
+      "name": "Rug Shield",
+      "price": 0.8,
+      "merkleVerified": true,
+      "guardianApproved": true
+    },
+    {
+      "id": "sk-snipe-guard",
+      "name": "Snipe Guard",
+      "price": 0.65,
+      "merkleVerified": true,
+      "guardianApproved": true
+    }
   ],
+  "guardianDecisions": [
+    {
+      "skill": "Rug Shield",
+      "approved": true,
+      "layer1": {
+        "pass": true,
+        "score": 1
+      },
+      "layer2": {
+        "pass": true,
+        "score": 0.82
+      },
+      "layer3": {
+        "pass": true,
+        "score": 1
+      },
+      "reasoning": "All 3 layers passed. Skill \"Rug Shield\" approved for acquisition."
+    },
+    {
+      "skill": "Snipe Guard",
+      "approved": true,
+      "layer1": {
+        "pass": true,
+        "score": 1
+      },
+      "layer2": {
+        "pass": true,
+        "score": 0.98
+      },
+      "layer3": {
+        "pass": true,
+        "score": 1
+      },
+      "reasoning": "All 3 layers passed. Skill \"Snipe Guard\" approved for acquisition."
+    },
+    {
+      "skill": "Alpha Decoder",
+      "approved": false,
+      "layer1": {
+        "pass": false,
+        "score": 0.8333333333333334
+      },
+      "layer2": {
+        "pass": false,
+        "score": 0
+      },
+      "layer3": {
+        "pass": false,
+        "score": 0
+      },
+      "reasoning": "Blocked at Layer 1 (Deterministic Rules)."
+    }
+  ],
+  "modelRouter": {
+    "totalQueries": 13,
+    "actualCost": 7.640000000000001,
+    "maxCost": 13,
+    "savingsPercent": "41.2"
+  },
+  "totalSpent": "1.4500",
+  "remainingBalance": "0.5500",
   "performance": {
-    "threatsBlocked": 1,
-    "solSaved": 2.4,
-    "skillsUsed": 1
+    "threatsDetected": 2,
+    "threatsBlocked": 2,
+    "potentialLossAvoided": 4.7,
+    "netROI": 3.25,
+    "proactiveAcquisitions": 1
   }
 }

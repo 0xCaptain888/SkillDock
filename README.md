@@ -12,17 +12,20 @@ Built for the **Solana Agent Economy Hackathon: Agent Talent Show** — Track 2:
 
 ## 🔗 On-Chain Verification (Solana Devnet)
 
-All core components are deployed on Solana Devnet with real, verifiable transactions:
+All core components are deployed on Solana Devnet with real, independently verifiable transactions:
 
-| Component | Type | Status |
-|-----------|------|--------|
-| SkillDock Collection NFT | SPL Token (supply=1) | ✅ Deployed |
-| Skill NFTs (×6) | SPL Token (1-of-1, mint auth revoked) | ✅ Minted |
-| x402 Agent Payment | SOL Transfer (Agent → Creator) | ✅ Verified |
-| NFT Skill Transfer | SPL Token Transfer | ✅ Verified |
-| Agent-to-Agent Payment | x402 Protocol | ✅ Verified |
+| Component | Explorer Link |
+|-----------|--------------|
+| SkillDock Collection NFT | [EMZusfmM4DCJ8VzcYkHjK8FnppfYoBHZpPvC87KPJZvo](https://explorer.solana.com/address/EMZusfmM4DCJ8VzcYkHjK8FnppfYoBHZpPvC87KPJZvo?cluster=devnet) |
+| Token Scanner Pro NFT | [View TX](https://explorer.solana.com/tx/2P27zgxeu1kdtBzysbeBiw39h57Dhu3usZrApKg4aaRCqvTd1uBhEgZio9HuNiFFKoqNUKtYbLCPVSxi8QC4vfYG?cluster=devnet) |
+| Rug Shield NFT | [View TX](https://explorer.solana.com/tx/3hxjHuidzADsam8uzA9cXBSyXReqscxLhch9PvMutXEJaqJRuPCkcdN1Zg42QW1MUWy5tT825WeLgxnXVs7boPiW?cluster=devnet) |
+| x402 Payment (Agent → Creator, 0.8 SOL) | [View TX](https://explorer.solana.com/tx/2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf?cluster=devnet) |
+| NFT Transfer (Rug Shield → Agent) | [View TX](https://explorer.solana.com/tx/4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ?cluster=devnet) |
+| x402 Agent-to-Agent (Alpha Decoder, 0.78 SOL) | [View TX](https://explorer.solana.com/tx/3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ?cluster=devnet) |
 
-> Run `node deploy-to-devnet.mjs` to reproduce the full deployment. All transaction hashes are logged to `deployment-results.json`.
+**11 total transactions** — all verifiable on Solana Explorer. See [`deployment-results.json`](./deployment-results.json) for the complete list.
+
+> Run `node deploy-step1.mjs` then `node deploy-step2.mjs` to reproduce the full deployment.
 
 ### Agent Autonomous Execution
 

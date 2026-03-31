@@ -81,8 +81,15 @@ class LLMEvaluator {
   }
 
   /**
-   * Simulates a structured LLM evaluation. In production this calls an LLM
-   * with a strict JSON schema and chain-of-thought prompt.
+   * Evaluates whether a skill matches a stated need using dual-mode logic:
+   *
+   * MODE 1 — Real LLM (when GROQ_API_KEY env var is set):
+   *   Makes a live API call to Groq (llama-3.1-8b-instant, free tier) with a
+   *   structured JSON prompt. The LLM response is parsed and used for scoring.
+   *
+   * MODE 2 — Simulation fallback (no API key, or API call fails):
+   *   Uses deterministic keyword-matching heuristics to produce the same output
+   *   shape. This ensures the system works offline and in tests.
    */
   async evaluate(need, skill) {
     // Structured output schema enforced by the LLM call
@@ -93,6 +100,72 @@ class LLMEvaluator {
       riskFactors: 'string[] — identified risks',
     };
 
+    // --- MODE 1: Real LLM via Groq API ---
+    const apiKey = process.env.GROQ_API_KEY;
+    if (apiKey) {
+      try {
+        const systemPrompt = 'You are a skill purchase evaluator for AI Agents. Respond ONLY with valid JSON.';
+        const userPrompt = [
+          `Evaluate whether the following skill matches the agent's need.`,
+          ``,
+          `Need: "${need}"`,
+          `Skill name: "${skill.name}"`,
+          `Description: "${skill.description}"`,
+          `Capability type: "${skill.capability_type}"`,
+          `Price: ${skill.price} SOL`,
+          `Rating: ${skill.rating ?? 'N/A'}`,
+          `Acquisitions: ${skill.acquisitions ?? 0}`,
+          ``,
+          `Respond with ONLY a JSON object in this exact format (no markdown, no extra text):`,
+          `{ "confidence": <number 0-1>, "needMatch": <boolean>, "reasoning": "<string>", "riskFactors": ["<string>", ...] }`,
+        ].join('\n');
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-8b-instant',
+            temperature: this.temperature,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt },
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Groq API returned HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content ?? '';
+        // Extract JSON from response (handle possible markdown fences)
+        const jsonStr = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        const parsed = JSON.parse(jsonStr);
+
+        const confidence = Math.max(0, Math.min(1, Number(parsed.confidence) || 0));
+        const needMatch = Boolean(parsed.needMatch);
+        const reasoning = String(parsed.reasoning || '');
+        const riskFactors = Array.isArray(parsed.riskFactors)
+          ? parsed.riskFactors.map(String)
+          : [];
+
+        const result = { confidence, reasoning, needMatch, riskFactors };
+        const pass = needMatch && confidence >= this.confidenceThreshold;
+        const score = confidence;
+        const details = `[LLM] Confidence: ${confidence.toFixed(2)} (threshold: ${this.confidenceThreshold}) | Match: ${needMatch} | Reasoning: ${reasoning}`;
+
+        return { pass, score, details, result, schema, temperature: this.temperature, mode: 'llm' };
+      } catch (err) {
+        // API call failed — fall through to simulation mode
+        console.warn(`  [LLMEvaluator] Groq API call failed, falling back to simulation: ${err.message}`);
+      }
+    }
+
+    // --- MODE 2: Simulation fallback (deterministic keyword matching) ---
     // Deterministic matching logic (simulates constrained LLM output)
     // Normalize hyphens and split into tokens for comparison
     const normalize = (s) => s.toLowerCase().replace(/-/g, ' ').replace(/[^a-z0-9 ]/g, '');
@@ -116,9 +189,9 @@ class LLMEvaluator {
     const result = { confidence, reasoning, needMatch, riskFactors };
     const pass = needMatch && confidence >= this.confidenceThreshold;
     const score = confidence;
-    const details = `Confidence: ${confidence.toFixed(2)} (threshold: ${this.confidenceThreshold}) | Match: ${needMatch} | Reasoning: ${reasoning}`;
+    const details = `[Simulation] Confidence: ${confidence.toFixed(2)} (threshold: ${this.confidenceThreshold}) | Match: ${needMatch} | Reasoning: ${reasoning}`;
 
-    return { pass, score, details, result, schema, temperature: this.temperature };
+    return { pass, score, details, result, schema, temperature: this.temperature, mode: 'simulation' };
   }
 }
 
@@ -279,9 +352,12 @@ class LLMGuardian {
 // ============================================================
 
 async function demonstrate() {
+  const llmMode = process.env.GROQ_API_KEY ? 'Real LLM (Groq API)' : 'Simulation (no GROQ_API_KEY)';
   console.log('');
   console.log('  +=====================================================+');
   console.log('  |  SkillDock LLM Guardian — Triple-Layer Demo         |');
+  console.log('  +=====================================================+');
+  console.log(`  |  Layer 2 mode: ${llmMode.padEnd(37)}|`);
   console.log('  +=====================================================+');
   console.log('');
 

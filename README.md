@@ -26,7 +26,7 @@ SkillDock introduces several industry firsts:
 | **First Skill-as-NFT Protocol** | SAP-1 defines the open standard for representing AI Agent capabilities as on-chain NFT assets with standardized metadata, versioning, and lifecycle |
 | **First Agent Autonomous Acquisition** | Agents browse a store, evaluate skills by composite scoring, and purchase within budgets — zero human configuration |
 | **First On-Chain Skill Registry** | Anchor smart contract maintaining a global, permissionless index of all registered skills with cryptographic verification |
-| **First Agent Skill Store on Solana Mobile** | Built for Seeker — mobile-native distribution for the agent economy |
+| **First Agent Skill Store for Solana Mobile** | Mobile-first UI designed for Seeker — responsive skill store with touch-native interactions |
 | **First x402-Powered Skill Marketplace** | Agent-to-agent payments for skill acquisition using the x402 protocol on Solana L1 |
 
 *Validation: We searched LangChain Hub (2,800+ tools), OpenAI Plugin Store (1,000+ plugins), Hugging Face Spaces, and 47 Solana ecosystem projects. None implement NFT-based skill ownership with autonomous Agent acquisition. Closest analog: OpenAI Plugin Store — but centralized, no ownership, no Agent autonomy, no on-chain verification.*
@@ -126,7 +126,8 @@ SkillDock solves all six problems with a single protocol: **SAP-1 (Skill Acquisi
 | **Merkle Verifier** | SHA-256 Merkle tree for skill metadata integrity verification | [`src/merkle-verifier.mjs`](./src/merkle-verifier.mjs) |
 | **LLM Guardian** | Triple-layer purchase verification: Rules + LLM + On-Chain | [`src/llm-guardian.mjs`](./src/llm-guardian.mjs) |
 | **Model Router** | Dual-model routing: lightweight (0.33x) vs strong (1.0x), 46% cost savings | [`src/llm-guardian.mjs`](./src/llm-guardian.mjs) |
-| **Agent Runtime** | Autonomous threat detection, skill search, purchase, install | [`agent-demo.mjs`](./agent-demo.mjs) |
+| **Agent Runtime** | Autonomous threat detection, skill search, purchase, install, execute | [`agent-demo.mjs`](./agent-demo.mjs) |
+| **Executable Skills** | Real skill modules with SAP-1 metadata and analysis logic | [`src/skills/`](./src/skills/) |
 | **Deploy Scripts** | Reproducible Devnet deployment (keypairs, collection, 6 NFTs, x402 payments) | [`deploy-step1.mjs`](./deploy-step1.mjs) / [`deploy-step2.mjs`](./deploy-step2.mjs) |
 
 ### LLM Hallucination Protection
@@ -142,6 +143,7 @@ Layer 1: Deterministic Rules (zero LLM)
   └── Creator reputation threshold
 
 Layer 2: LLM Evaluation (constrained)
+  ├── Real LLM API (Groq llama-3.1-8b, temp=0.1) with simulation fallback
   ├── Structured JSON output only (no free-form)
   ├── Confidence threshold (<0.7 = reject)
   ├── Chain-of-thought reasoning required
@@ -182,36 +184,34 @@ All core components are deployed with real, independently verifiable transaction
 
 ### Agent Autonomous Execution Demo
 
+<p align="center">
+  <img src="./assets/agent-demo.svg" alt="SkillDock Agent Demo" width="100%">
+</p>
+
 ```
 Threat Detected ($FAKE hidden mint function)
-  → LLM Guardian Layer 1: Budget OK, no blacklist, no duplicate ✅
-  → LLM Guardian Layer 2: Confidence 0.82, reasoning verified ✅
-  → LLM Guardian Layer 3: NFT active, Merkle proof valid ✅
-  → Search SkillDock → Best match: Rug Shield (★4.8, 1800 installs)
+  → LLM Guardian: L1=PASS L2=PASS(0.82) L3=PASS → APPROVED
   → x402 Payment: 0.8 SOL → Creator wallet (confirmed)
   → NFT Transfer: Rug Shield → Agent wallet
-  → Skill Installed → Contract Analysis → Rug Pull Blocked
-  → Saved 3.2 SOL | Cost 0.8 SOL | Net +2.4 SOL
+  → Skill Installed → RugShieldSkill.analyze() executed:
+      Risk: CRITICAL (75/100)
+      [CRITICAL] HIDDEN_MINT: Unrestricted mint function — owner can inflate supply
+      [CRITICAL] LP_UNLOCKED: Liquidity NOT locked — owner can pull pool
+      [MEDIUM]   OWNER_ACTIVE: Ownership NOT renounced
+  → Transaction BLOCKED. Saved 3.2 SOL | Cost 0.8 SOL | Net +2.4 SOL
 
 Threat Detected ($SCAM honeypot — sell restriction)
-  → LLM Guardian Layer 1: Budget OK, no blacklist, no duplicate ✅
-  → LLM Guardian Layer 2: Confidence 0.98, MEV-protection match ✅
-  → LLM Guardian Layer 3: NFT active, Merkle proof valid ✅
-  → Search SkillDock → Best match: Snipe Guard (★4.7, 940 installs)
+  → LLM Guardian: L1=PASS L2=PASS(0.98) L3=PASS → APPROVED
   → x402 Payment: 0.65 SOL → Creator wallet (confirmed)
-  → NFT Transfer: Snipe Guard → Agent wallet
-  → Skill Installed → Honeypot Blocked
+  → Snipe Guard installed → Honeypot BLOCKED
   → Saved 1.5 SOL | Cost 0.65 SOL | Net +0.85 SOL
 
-Scenario 3: Proactive Alpha Acquisition
-  → Agent scans for capability gaps in analytics category
-  → LLM Guardian Layer 1: Budget OK, not owned, price normal ✅
-  → LLM Guardian Layer 2: Confidence 0.98, whale-watching match ✅
-  → LLM Guardian Layer 3: NFT active, Merkle proof valid ✅
-  → Search SkillDock → Best match: Alpha Decoder (★4.6, 1100 installs)
+Proactive: Alpha Signal Detection
+  → LLM Guardian: L1=PASS L2=PASS(0.98) L3=PASS → APPROVED
   → x402 Payment: 0.78 SOL → Creator wallet (confirmed)
-  → NFT Transfer: Alpha Decoder → Agent wallet
-  → Skill Installed → First scan: whale accumulation in $DRIFT (+18% in 2h)
+  → Alpha Decoder installed → AlphaDecoderSkill.analyze() executed:
+      Signal: BUY (confidence 84%)
+      [+25.2] WHALE_ACCUMULATION: Net inflow $420k
 
 Session Summary:
   Skills Acquired: 3 (Rug Shield + Snipe Guard + Alpha Decoder)
@@ -293,7 +293,10 @@ SkillDock/
 │       └── programs/skill-registry/src/lib.rs
 ├── src/
 │   ├── merkle-verifier.mjs    # Merkle tree metadata verification
-│   └── llm-guardian.mjs       # Triple-layer LLM hallucination protection
+│   ├── llm-guardian.mjs       # Triple-layer LLM hallucination protection (Groq API + fallback)
+│   └── skills/
+│       ├── rug-shield.mjs     # Executable: rug-pull detection heuristics (5 checks)
+│       └── alpha-decoder.mjs  # Executable: alpha signal detection (4 indicators)
 ├── tests/
 │   └── run-tests.mjs          # 19 automated tests (Merkle + Guardian + regression)
 ├── docs/
@@ -325,6 +328,13 @@ node deploy-step2.mjs    # Full deployment
 
 # Run agent demo
 node agent-demo.mjs
+
+# Run individual skill modules
+node src/skills/rug-shield.mjs
+node src/skills/alpha-decoder.mjs
+
+# Run with real LLM (optional — works without)
+GROQ_API_KEY=your_key node agent-demo.mjs
 
 # Run Merkle verification
 node src/merkle-verifier.mjs

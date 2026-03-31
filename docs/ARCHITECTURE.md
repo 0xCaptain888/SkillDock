@@ -145,8 +145,19 @@ Composite Scoring: relevance × rating × (1/price) × trust_factor
   ↓
 LLM Guardian: triple-layer verification (see Layer 5)
   ↓
-x402 Payment → NFT Transfer → Install → Execute
+x402 Payment → NFT Transfer → Install → **Execute Skill Module**
 ```
+
+**Executable Skill Modules** ([`src/skills/`](../src/skills/)):
+
+After NFT ownership is verified, the agent dynamically loads and executes the corresponding skill module:
+
+| Skill Module | Analysis Type | Output |
+|-------------|---------------|--------|
+| `rug-shield.mjs` | Contract risk heuristics (5 checks: hidden mint, honeypot, LP lock, ownership, proxy) | `{ riskLevel, score: 0-100, findings[] }` |
+| `alpha-decoder.mjs` | On-chain alpha signals (4 indicators: whale flow, volume, smart money, social) | `{ signal, confidence: 0-1, indicators[] }` |
+
+Each module implements `static describe()` returning SAP-1 compatible metadata and `analyze(data)` for execution.
 
 **Composite Scoring Formula (SAP-1 Discovery Protocol):**
 ```

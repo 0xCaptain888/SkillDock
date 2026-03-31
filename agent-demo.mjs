@@ -14,6 +14,14 @@
 import fs from 'fs';
 import { SkillMetadataVerifier, SKILLDOCK_SKILLS, MerkleTree } from './src/merkle-verifier.mjs';
 import { LLMGuardian } from './src/llm-guardian.mjs';
+import { RugShieldSkill } from './src/skills/rug-shield.mjs';
+import { AlphaDecoderSkill } from './src/skills/alpha-decoder.mjs';
+
+// Executable skill modules — loaded after NFT ownership verified
+const SKILL_MODULES = {
+  'sk-rug-shield': RugShieldSkill,
+  'sk-alpha-decoder': AlphaDecoderSkill,
+};
 
 // ================================================
 // AGENT CONFIGURATION
@@ -53,6 +61,7 @@ const THREAT_SCENARIOS = [
     potentialLoss: 3.2,
     requiredSkillTags: ['rug-protection', 'rug-detection', 'auto-block'],
     need: 'I need protection against rug pull attacks — detected hidden mint function in token contract',
+    contractData: { hasMintFunction: true, mintCapped: false, maxSellPct: 100, sellTaxPct: 0, lpLocked: false, lpLockDays: 0, ownerRenounced: false, isProxy: false },
   },
   {
     token: '$SCAM',
@@ -63,6 +72,7 @@ const THREAT_SCENARIOS = [
     potentialLoss: 1.5,
     requiredSkillTags: ['mev-protection', 'sandwich-block', 'front-run-defense'],
     need: 'I need MEV protection and sandwich attack defense for DEX trading',
+    contractData: { hasMintFunction: false, maxSellPct: 0, sellTaxPct: 45, lpLocked: true, lpLockDays: 30, ownerRenounced: false, isProxy: true },
   },
 ];
 
@@ -319,8 +329,21 @@ class SkillDockAgent {
       this.record('INSTALL', `"${best.name}" → agent runtime. Verifying NFT ownership...`);
       this.record('ACTIVATE', `"${best.name}" is now ACTIVE`);
       await this.delay(200);
-      this.record('PROTECT', `"${best.name}" analyzing ${threat.token}...`);
-      this.record('PROTECT', `Result: ${threat.type} confirmed. Transaction BLOCKED.`);
+
+      // Execute the actual skill module if available
+      const SkillModule = SKILL_MODULES[best.id];
+      if (SkillModule && threat.contractData) {
+        const skill = new SkillModule();
+        const analysis = skill.analyze(threat.contractData);
+        this.record('PROTECT', `"${best.name}" analyzing ${threat.token}... → Risk: ${analysis.riskLevel} (${analysis.score}/100)`);
+        analysis.findings.forEach(f => {
+          this.record('PROTECT', `  [${f.severity}] ${f.id}: ${f.detail}`);
+        });
+        this.record('PROTECT', `Result: ${threat.type} confirmed. Transaction BLOCKED. (${analysis.recommendation})`);
+      } else {
+        this.record('PROTECT', `"${best.name}" analyzing ${threat.token}...`);
+        this.record('PROTECT', `Result: ${threat.type} confirmed. Transaction BLOCKED.`);
+      }
       this.record('RESULT', `Saved ${threat.potentialLoss} SOL | Cost ${best.price} SOL | Net +${(threat.potentialLoss - best.price).toFixed(1)} SOL`);
     }
   }
@@ -344,8 +367,26 @@ class SkillDockAgent {
     const purchased = await this.verifyAndPurchase(best, scenario.need);
     if (purchased) {
       this.record('INSTALL', `"${best.name}" installed and activated`);
-      this.record('ACTIVATE', `Running first scan... detected whale accumulation in $DRIFT (+18% in 2h)`);
-      this.record('RESULT', `Proactive acquisition complete. Agent capabilities expanded.`);
+
+      // Execute the actual skill module if available
+      const SkillModule = SKILL_MODULES[best.id];
+      if (SkillModule) {
+        const skill = new SkillModule();
+        const sampleData = {
+          whaleNetFlow: 420000, volume7dAvg: 180000, currentVolume: 936000,
+          smartMoneyWallets: 4, socialMentions24h: 820, socialMentionsPrior: 200,
+        };
+        const analysis = skill.analyze(sampleData);
+        this.record('ACTIVATE', `Running first scan... Signal: ${analysis.signal} (confidence ${(analysis.confidence * 100).toFixed(0)}%)`);
+        analysis.indicators.forEach(ind => {
+          const sign = ind.weight > 0 ? '+' : '';
+          this.record('ACTIVATE', `  [${sign}${ind.weight.toFixed(1)}] ${ind.id}: ${ind.detail}`);
+        });
+        this.record('RESULT', `Proactive acquisition complete. ${analysis.summary}`);
+      } else {
+        this.record('ACTIVATE', `Running first scan... detected whale accumulation in $DRIFT (+18% in 2h)`);
+        this.record('RESULT', `Proactive acquisition complete. Agent capabilities expanded.`);
+      }
     }
   }
   delay(ms) {

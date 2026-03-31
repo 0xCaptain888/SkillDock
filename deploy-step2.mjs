@@ -7,19 +7,6 @@
  * Proxy support: set https_proxy=http://127.0.0.1:PORT before running
  */
 
-// --- Proxy setup (patches ALL Node.js HTTP/HTTPS requests) ---
-const proxyUrl = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
-if (proxyUrl) {
-  process.env.GLOBAL_AGENT_HTTP_PROXY = proxyUrl;
-  process.env.GLOBAL_AGENT_HTTPS_PROXY = proxyUrl;
-  process.env.GLOBAL_AGENT_NO_PROXY = '';
-  const ga = await import('global-agent');
-  ga.bootstrap();
-  console.log(`  🌐 Proxy enabled: ${proxyUrl}`);
-} else {
-  console.log('  🌐 No proxy detected (set https_proxy if needed)');
-}
-
 import {
   Connection, Keypair, LAMPORTS_PER_SOL, PublicKey,
   SystemProgram, Transaction, sendAndConfirmTransaction,
@@ -29,6 +16,20 @@ import {
   createTransferInstruction, createSetAuthorityInstruction, AuthorityType,
 } from '@solana/spl-token';
 import fs from 'fs';
+import nodeFetch from 'node-fetch';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+
+// --- Proxy-aware fetch ---
+const proxyUrl = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
+let fetchWithProxy;
+if (proxyUrl) {
+  const agent = new HttpsProxyAgent(proxyUrl);
+  fetchWithProxy = (url, opts = {}) => nodeFetch(url, { ...opts, agent });
+  console.log(`🌐 Proxy enabled: ${proxyUrl}`);
+} else {
+  fetchWithProxy = nodeFetch;
+  console.log('🌐 No proxy detected (set https_proxy if needed)');
+}
 
 // Try multiple RPC endpoints in case one is down
 const RPC_URLS = [
@@ -42,9 +43,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function connectToRPC() {
   for (const url of RPC_URLS) {
     try {
-      const conn = new Connection(url, 'confirmed');
-      await conn.getLatestBlockhash(); // test connectivity
-      console.log(`  🌐 Connected to: ${url.split('?')[0]}`);
+      const conn = new Connection(url, {
+        commitment: 'confirmed',
+        fetch: fetchWithProxy,
+      });
+      await conn.getLatestBlockhash();
+      console.log(`🌐 Connected to: ${url.split('?')[0]}`);
       return conn;
     } catch (e) {
       console.log(`  ⚠️ ${url.split('?')[0]} — unreachable, trying next...`);

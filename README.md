@@ -10,7 +10,7 @@
 
 **One-line Pitch**: SkillDock is the App Store for AI Agents — every skill is an NFT, agents browse and buy autonomously, creators earn SOL, all payments flow through x402. No humans required.
 
-**[Live Demo](https://0xcaptain888.github.io/SkillDock/)** · **[SAP-1 Protocol Spec](./protocol/SAP-1.md)** · **[Architecture](./docs/ARCHITECTURE.md)** · **[Engineering Log](./docs/ENGINEERING_LOG.md)**
+**[Live Demo](https://0xcaptain888.github.io/SkillDock/)** · **[SAP-1 Protocol Spec](./protocol/SAP-1.md)** · **[Architecture](./docs/ARCHITECTURE.md)** · **[Engineering Log](./docs/ENGINEERING_LOG.md)** · **[Contributing](./CONTRIBUTING.md)**
 
 Built for **Solana Agent Economy Hackathon: Agent Talent Show**
 — Track 1: Agent-to-Agent Economy × Track 2: Solana Mobile
@@ -125,7 +125,7 @@ SkillDock solves all six problems with a single protocol: **SAP-1 (Skill Acquisi
 | **SkillRegistry (Anchor)** | On-chain program: register, acquire, rate, deprecate, flag skills | [`contracts/skill-registry/`](./contracts/skill-registry/) |
 | **Merkle Verifier** | SHA-256 Merkle tree for skill metadata integrity verification | [`src/merkle-verifier.mjs`](./src/merkle-verifier.mjs) |
 | **LLM Guardian** | Triple-layer purchase verification: Rules + LLM + On-Chain | [`src/llm-guardian.mjs`](./src/llm-guardian.mjs) |
-| **Model Router** | Dual-model routing: lightweight (0.33x) vs strong (1.0x), 46% cost savings | [`src/llm-guardian.mjs`](./src/llm-guardian.mjs) |
+| **Model Router** | Dual-model routing: lightweight (0.33x) vs strong (1.0x), 43% cost savings | [`src/llm-guardian.mjs`](./src/llm-guardian.mjs) |
 | **Agent Runtime** | Autonomous threat detection, skill search, purchase, install, execute | [`agent-demo.mjs`](./agent-demo.mjs) |
 | **Executable Skills** | Real skill modules with SAP-1 metadata and analysis logic | [`src/skills/`](./src/skills/) |
 | **Deploy Scripts** | Reproducible Devnet deployment (keypairs, collection, 6 NFTs, x402 payments) | [`deploy-step1.mjs`](./deploy-step1.mjs) / [`deploy-step2.mjs`](./deploy-step2.mjs) |
@@ -165,7 +165,7 @@ Layer 3: On-Chain Verification (trustless)
 | Simple (search, price) | Lightweight | 0.33x | "Find security skills under 1 SOL" |
 | Complex (threat eval, strategy) | Strong | 1.0x | "Evaluate if $FAKE contract is malicious" |
 
-**Measured savings: 46% cost reduction** per agent session.
+**Measured savings: 43% cost reduction** per agent session (17 queries, 9.63 actual vs 17.0 max cost units).
 
 ---
 
@@ -296,6 +296,7 @@ Real bugs. Real fixes. [Full log →](./docs/ENGINEERING_LOG.md)
 | 5 | Bilingual toggle not persisting | Low | localStorage persistence |
 | 6 | Merkle tree leaf ordering non-deterministic | Medium | Sorted-pair concatenation for deterministic nodes |
 | 7 | LLM Guardian false positive on low-price skills | Medium | Price anomaly uses category median, not global |
+| 8 | Skill module field name mismatch | High | Align THREAT_SCENARIOS data with skill module input schema |
 
 ---
 
@@ -326,6 +327,7 @@ SkillDock/
 ├── deployment-results.json    # All transaction signatures
 ├── agent-execution-log.json   # Agent execution trace
 ├── index.html                 # Interactive Demo (mobile-first, bilingual)
+├── CONTRIBUTING.md            # Contributor guide with skill module template
 └── package.json
 ```
 

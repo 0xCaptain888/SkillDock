@@ -1,1 +1,26 @@
 node_modules/
+
+# Environment & secrets
+.env
+.env.*
+.keypairs.json
+keypair*.json
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*

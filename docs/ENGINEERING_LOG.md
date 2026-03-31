@@ -214,3 +214,36 @@ Also added a minimum threshold: categories with < 3 skills skip the price anomal
 
 ### Lesson
 Statistical anomaly detection must respect data segments. A global threshold applied to heterogeneous categories produces systematic false positives against the cheapest category. Always segment by the most relevant dimension first.
+
+---
+
+## Postmortem #8: Skill Module Field Name Mismatch
+
+**Date**: 2026-03-30
+**Severity**: High (integration)
+**Duration**: ~1 hour
+
+### What happened
+After creating the executable skill modules (RugShieldSkill, SnipeGuardSkill, AlphaDecoderSkill), the agent demo would run the skills but produce wrong results. RugShieldSkill returned `MEDIUM (30/100)` for a contract with an obvious hidden mint function — it should have been `CRITICAL (75/100)`.
+
+### Root cause
+The agent demo's `THREAT_SCENARIOS` data used different field names than the skill modules expected:
+
+```javascript
+// agent-demo.mjs passed:
+{ mintable: true, maxMintAmount: Infinity, ... }
+
+// RugShieldSkill expected:
+{ hasMintFunction: true, mintCapped: false, ... }
+```
+
+Similarly, AlphaDecoderSkill output used `ind.weight` and `ind.id`, but the demo tried to read `ind.contribution` and `ind.name`, causing `TypeError: Cannot read properties of undefined`.
+
+### Fix
+Updated all `THREAT_SCENARIOS` data objects to use the exact field names each skill module expects:
+- RugShield: `hasMintFunction`, `mintCapped`, `maxSellPct`, `sellTaxPct`, `lpLocked`, `lpLockDays`, `ownerRenounced`, `isProxy`
+- SnipeGuard: `dexRouter`, `slippagePct`, `poolLiquidityUsd`, `tradeAmountUsd`, `mempoolVisible`, `priorityFee`, `recentSandwiches`
+- AlphaDecoder output: `ind.weight`, `ind.id`, `analysis.summary`
+
+### Lesson
+When integrating separately developed modules, **never assume field names match**. Define a shared schema (SAP-1 `input`/`output` spec) and validate at integration time. This bug would have been caught by a simple JSON schema validator or TypeScript interfaces.

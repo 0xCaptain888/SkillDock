@@ -2829,23 +2829,23 @@ const skills = [
   { id:1, icon:'⚡', name:'DeFi Sniper', creator:'AlphaVault', price:1.2, installs:'1.8K', rating:4.7, reviews:312, earnings:'42.5 SOL', desc:'Auto-snipes promising liquidity pool entries within milliseconds of detection, with configurable risk parameters and stop-loss triggers.', tags:['DeFi','Trading','Speed'], change:'+28%' },
   { id:2, icon:'🛡️', name:'Rug Shield', creator:'SafeGuard DAO', price:0.8, installs:'3.1K', rating:4.8, reviews:589, earnings:'7.2 SOL', desc:'Real-time rug pull detection engine. Monitors LP locks, ownership changes, and contract mutations — auto-exits positions when threats detected.', tags:['Security','DeFi','Protection'], change:'+45%' },
   { id:3, icon:'📊', name:'Whale Tracker', creator:'DeepSea Analytics', price:0.3, installs:'4.2K', rating:4.6, reviews:723, earnings:'5.1 SOL', desc:'Monitors top 500 whale wallets across Solana. Alerts on significant movements, accumulation patterns, and distribution events.', tags:['Analytics','Tracking','Alpha'], change:'+18%' },
-  { id:4, icon:'💬', name:'Alpha Decoder', creator:'CT Research', price:0.6, installs:'1.5K', rating:4.5, reviews:198, earnings:'9.8 SOL', desc:'Parses Crypto Twitter in real-time for actionable alpha signals. NLP-powered sentiment analysis with confidence scoring.', tags:['Social','NLP','Alpha'], change:'+12%' },
+  { id:4, icon:'💬', name:'Alpha Decoder', creator:'CT Research', price:0.78, installs:'1.1K', rating:4.6, reviews:198, earnings:'9.8 SOL', desc:'Identifies early alpha signals from on-chain data, whale movements, and social sentiment. 4-indicator scoring engine with confidence thresholds.', tags:['Analytics','Alpha','Data'], change:'+12%' },
   { id:5, icon:'🔄', name:'Smart Swap', creator:'RouteOptim', price:0.4, installs:'5.6K', rating:4.9, reviews:891, earnings:'3.4 SOL', desc:'Finds optimal swap routes across all major Solana DEXes. MEV-protected, slippage-optimized, with Jupiter integration.', tags:['DeFi','Swap','Optimization'], change:'+52%' },
-  { id:6, icon:'📰', name:'News Pulse', creator:'CryptoWire', price:0.2, installs:'2.9K', rating:4.4, reviews:445, earnings:'2.1 SOL', desc:'Real-time crypto news aggregation with AI sentiment analysis. Categorizes by impact level and generates actionable briefings.', tags:['News','Sentiment','AI'], change:'+8%' },
-  { id:7, icon:'🎯', name:'Sniper Bot', creator:'PrecisionDEX', price:1.5, installs:'980', rating:4.6, reviews:156, earnings:'67.3 SOL', desc:'Token launch sniping with full MEV protection. Configurable gas strategies, auto-sell targets, and position management.', tags:['Trading','Sniping','MEV'], change:'+61%' },
-  { id:8, icon:'🏦', name:'Yield Optimizer', creator:'CompoundAI', price:0.7, installs:'1.2K', rating:4.7, reviews:267, earnings:'21.8 SOL', desc:'Auto-compounds yields across Solana DeFi protocols. Dynamically rebalances between highest APY opportunities.', tags:['DeFi','Yield','Auto'], change:'+22%' },
-  { id:9, icon:'🤖', name:'Social Agent', creator:'Engagement Labs', price:0.9, installs:'890', rating:4.3, reviews:134, earnings:'4.7 SOL', desc:'Autonomous social engagement on Crypto Twitter. Strategy-driven replies, thread creation, and community interaction.', tags:['Social','Engagement','Auto'], change:'+15%' },
+  { id:6, icon:'⛽', name:'Gas Oracle', creator:'FeeOptim DAO', price:0.25, installs:'1.6K', rating:4.4, reviews:445, earnings:'2.1 SOL', desc:'Predicts optimal transaction timing and priority fees using historical congestion patterns. Saves agents SOL on every transaction.', tags:['Utility','Optimization','Fees'], change:'+8%' },
+  { id:7, icon:'📡', name:'Social Sentinel', creator:'SignalWatch', price:0.5, installs:'480', rating:4.3, reviews:134, earnings:'4.7 SOL', desc:'Monitors Twitter/X, Discord, and Telegram for coordinated shill campaigns and FUD attacks. Real-time alert system for narrative shifts.', tags:['Social','Monitoring','Security'], change:'+15%' },
+  { id:8, icon:'🏦', name:'Yield Optimizer', creator:'CompoundAI', price:0.95, installs:'720', rating:4.5, reviews:267, earnings:'21.8 SOL', desc:'Auto-compounds yields across Solana DeFi protocols. Risk-adjusted allocation with dynamic rebalancing between highest APY opportunities.', tags:['DeFi','Yield','Auto'], change:'+22%' },
+  { id:9, icon:'🛡️', name:'Snipe Guard', creator:'PrecisionDEX', price:0.65, installs:'940', rating:4.7, reviews:156, earnings:'8.3 SOL', desc:'Protects against front-running and sandwich attacks on DEX trades. MEV-aware routing with slippage analysis, mempool monitoring, and priority fee optimization.', tags:['Security','MEV','DeFi'], change:'+38%' },
 ];
 
 const categories = ['All','Trading','DeFi','Security','Analytics','Social','NFT'];
-const installedIds = [0, 2, 3, 5, 7];
+const installedIds = [0, 2, 4, 6, 9];
 
 const activityLogData = [
   { time:'2m ago', text:'<strong>Rug Shield</strong> blocked suspicious token <span class="profit">saved 0.8 SOL</span>' },
-  { time:'8m ago', text:'<strong>Smart Swap</strong> optimized route for SOL→USDC <span class="profit">+0.02 SOL saved</span>' },
+  { time:'8m ago', text:'<strong>Snipe Guard</strong> blocked sandwich attack on Raydium <span class="profit">saved 0.12 SOL</span>' },
   { time:'14m ago', text:'<strong>Token Scanner</strong> found 3 new launches, flagged 2 as risky' },
-  { time:'31m ago', text:'<strong>Whale Tracker</strong> detected accumulation by wallet 7xK3...f2a1' },
-  { time:'1h ago', text:'<strong>Sniper Bot</strong> executed entry on $DRIFT <span class="profit">+2.4 SOL</span>' },
+  { time:'31m ago', text:'<strong>Alpha Decoder</strong> detected whale accumulation in $DRIFT <span class="profit">BUY signal (84%)</span>' },
+  { time:'1h ago', text:'<strong>Gas Oracle</strong> optimized priority fee <span class="profit">saved 0.003 SOL</span>' },
 ];
 
 const feedTemplates = [

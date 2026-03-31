@@ -22,7 +22,7 @@ const AGENT_CONFIG = {
   id: 'Agent #7291',
   name: 'CrawBot Omega',
   wallet: null,
-  budget: { max: 2.0, perSkill: 1.5 },
+  budget: { max: 3.0, perSkill: 1.5 },
   priorities: ['security', 'defi', 'analytics'],
   installedSkills: [],
   pendingThreats: [],

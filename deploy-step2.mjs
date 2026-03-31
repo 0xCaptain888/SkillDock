@@ -15,8 +15,29 @@ import {
 } from '@solana/spl-token';
 import fs from 'fs';
 
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+// Try multiple RPC endpoints in case one is down
+const RPC_URLS = [
+  'https://api.devnet.solana.com',
+  'https://devnet.helius-rpc.com/?api-key=1d8740dc-e5f4-421c-b823-e1bad1889eff',
+];
+
+let connection;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function connectToRPC() {
+  for (const url of RPC_URLS) {
+    try {
+      const conn = new Connection(url, 'confirmed');
+      await conn.getLatestBlockhash(); // test connectivity
+      console.log(`  🌐 Connected to: ${url.split('?')[0]}`);
+      return conn;
+    } catch (e) {
+      console.log(`  ⚠️ ${url.split('?')[0]} — unreachable, trying next...`);
+    }
+  }
+  throw new Error('All RPC endpoints failed. Check your internet connection.');
+}
+
 
 // Load keypairs from step 1
 if (!fs.existsSync('.keypairs.json')) {
@@ -65,6 +86,10 @@ async function main() {
   console.log('');
   console.log('⚡ SkillDock — Solana Devnet Deployment (Step 2)');
   console.log('=================================================');
+
+  // Connect to RPC
+  console.log('\n📌 Connecting to Solana Devnet...\n');
+  connection = await connectToRPC();
 
   // Check balances first
   console.log('\n📌 Checking wallet balances...\n');

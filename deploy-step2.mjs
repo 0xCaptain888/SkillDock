@@ -7,12 +7,17 @@
  * Proxy support: set https_proxy=http://127.0.0.1:PORT before running
  */
 
-// --- Proxy setup (must be BEFORE other imports) ---
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
+// --- Proxy setup (patches ALL Node.js HTTP/HTTPS requests) ---
 const proxyUrl = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
 if (proxyUrl) {
-  console.log(`  🌐 Using proxy: ${proxyUrl}`);
-  setGlobalDispatcher(new ProxyAgent(proxyUrl));
+  process.env.GLOBAL_AGENT_HTTP_PROXY = proxyUrl;
+  process.env.GLOBAL_AGENT_HTTPS_PROXY = proxyUrl;
+  process.env.GLOBAL_AGENT_NO_PROXY = '';
+  const ga = await import('global-agent');
+  ga.bootstrap();
+  console.log(`  🌐 Proxy enabled: ${proxyUrl}`);
+} else {
+  console.log('  🌐 No proxy detected (set https_proxy if needed)');
 }
 
 import {

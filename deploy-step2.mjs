@@ -20,15 +20,57 @@ import nodeFetch from 'node-fetch';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
 // --- Proxy-aware fetch ---
+// Auto-detect proxy from env, or try common local proxy ports
 const proxyUrl = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
-let fetchWithProxy;
-if (proxyUrl) {
-  const agent = new HttpsProxyAgent(proxyUrl);
-  fetchWithProxy = (url, opts = {}) => nodeFetch(url, { ...opts, agent });
-  console.log(`🌐 Proxy enabled: ${proxyUrl}`);
-} else {
-  fetchWithProxy = nodeFetch;
-  console.log('🌐 No proxy detected (set https_proxy if needed)');
+const PROXY_CANDIDATES = [
+  proxyUrl,
+  'http://127.0.0.1:7897',  // Clash Verge
+  'http://127.0.0.1:7890',  // Clash
+  'http://127.0.0.1:1087',  // V2Ray
+  'http://127.0.0.1:1080',  // SOCKS common
+].filter(Boolean);
+
+let fetchWithProxy = nodeFetch; // default: no proxy
+
+// Test which proxy works
+for (const candidate of PROXY_CANDIDATES) {
+  try {
+    const testAgent = new HttpsProxyAgent(candidate);
+    const res = await nodeFetch('https://api.devnet.solana.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getHealth' }),
+      agent: testAgent,
+      timeout: 5000,
+    });
+    if (res.ok) {
+      const agent = new HttpsProxyAgent(candidate);
+      fetchWithProxy = (url, opts = {}) => nodeFetch(url, { ...opts, agent });
+      console.log(`🌐 Proxy connected: ${candidate}`);
+      break;
+    }
+  } catch (e) {
+    // try next
+  }
+}
+
+// Also try direct connection (no proxy)
+if (fetchWithProxy === nodeFetch) {
+  try {
+    const res = await nodeFetch('https://api.devnet.solana.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getHealth' }),
+      timeout: 5000,
+    });
+    if (res.ok) {
+      console.log('🌐 Direct connection OK (no proxy needed)');
+    }
+  } catch (e) {
+    console.log('❌ Cannot connect to Solana devnet. Check your internet/proxy.');
+    console.log('   Set https_proxy=http://127.0.0.1:YOUR_PORT if behind a firewall.');
+    process.exit(1);
+  }
 }
 
 // Try multiple RPC endpoints in case one is down

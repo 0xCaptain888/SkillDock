@@ -76,7 +76,26 @@ async function main() {
   console.log(`  Agent:    ${(agentBal / LAMPORTS_PER_SOL).toFixed(2)} SOL`);
   console.log(`  Creator:  ${(creatorBal / LAMPORTS_PER_SOL).toFixed(2)} SOL`);
 
-  if (depBal < 1.5 * LAMPORTS_PER_SOL || agentBal < 1.5 * LAMPORTS_PER_SOL || creatorBal < 0.5 * LAMPORTS_PER_SOL) {
+  // Auto-fund Creator from Deployer if needed
+  if (creatorBal < 0.5 * LAMPORTS_PER_SOL && depBal >= 2 * LAMPORTS_PER_SOL) {
+    console.log('\n  ⚡ Creator unfunded — transferring 1 SOL from Deployer...');
+    const fundTx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: deployer.publicKey,
+        toPubkey: creatorWallet.publicKey,
+        lamports: 1 * LAMPORTS_PER_SOL,
+      })
+    );
+    const fundSig = await sendAndConfirmTransaction(connection, fundTx, [deployer]);
+    log('Fund Creator from Deployer (1 SOL)', fundSig);
+  }
+
+  // Re-check
+  const depBal2 = await connection.getBalance(deployer.publicKey);
+  const agentBal2 = await connection.getBalance(agentWallet.publicKey);
+  const creatorBal2 = await connection.getBalance(creatorWallet.publicKey);
+
+  if (depBal2 < 1 * LAMPORTS_PER_SOL || agentBal2 < 1 * LAMPORTS_PER_SOL || creatorBal2 < 0.3 * LAMPORTS_PER_SOL) {
     console.log('\n❌ Insufficient balance. Please fund the wallets first:');
     console.log('   Go to https://faucet.solana.com and airdrop to the addresses from step 1.');
     process.exit(1);

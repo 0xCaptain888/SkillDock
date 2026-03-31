@@ -2090,6 +2090,44 @@ select.pub-input {
             <span class="smb-dot"></span>
             <span data-i18n="built_for">Built for Solana Mobile · Seeker</span>
           </div>
+
+          <!-- ON-CHAIN PROOF SECTION -->
+          <div style="margin-top:20px;padding:14px;background:linear-gradient(135deg,rgba(20,241,149,0.08),rgba(153,69,255,0.08));border:1px solid rgba(20,241,149,0.2);border-radius:14px;">
+            <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--sol-green);margin-bottom:10px;" data-i18n="proof_title">🔗 On-Chain Proof (Solana Devnet)</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;" data-i18n="proof_desc">11 verified transactions. Click to view on Solana Explorer.</div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <a href="https://explorer.solana.com/address/EMZusfmM4DCJ8VzcYkHjK8FnppfYoBHZpPvC87KPJZvo?cluster=devnet" target="_blank" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;text-decoration:none;font-size:11px;">
+                <span style="color:var(--text-primary);" data-i18n="proof_collection">⬡ SkillDock Collection NFT</span>
+                <span style="font-family:var(--font-mono);color:var(--sol-green);font-size:10px;">EMZu...JZvo ↗</span>
+              </a>
+              <a href="https://explorer.solana.com/tx/2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf?cluster=devnet" target="_blank" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;text-decoration:none;font-size:11px;">
+                <span style="color:var(--text-primary);" data-i18n="proof_x402">◎ x402 Payment (0.8 SOL)</span>
+                <span style="font-family:var(--font-mono);color:var(--sol-blue);font-size:10px;">2UsE...ewJf ↗</span>
+              </a>
+              <a href="https://explorer.solana.com/tx/4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ?cluster=devnet" target="_blank" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;text-decoration:none;font-size:11px;">
+                <span style="color:var(--text-primary);" data-i18n="proof_nft">📦 NFT Transfer → Agent</span>
+                <span style="font-family:var(--font-mono);color:var(--sol-purple);font-size:10px;">4nSq...4EiJ ↗</span>
+              </a>
+              <a href="https://explorer.solana.com/tx/3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ?cluster=devnet" target="_blank" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;text-decoration:none;font-size:11px;">
+                <span style="color:var(--text-primary);" data-i18n="proof_a2a">🤖 Agent-to-Agent (0.78 SOL)</span>
+                <span style="font-family:var(--font-mono);color:var(--sol-green);font-size:10px;">3WnV...kqeZ ↗</span>
+              </a>
+            </div>
+
+            <div style="margin-top:10px;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);">
+              <div style="color:var(--sol-green);margin-bottom:4px;" data-i18n="proof_summary">📊 Deployment Summary</div>
+              <div>Collection: EMZusfmM4DCJ8V...KPJZvo</div>
+              <div>Skills Minted: 6 NFTs (mint auth revoked)</div>
+              <div>x402 Payments: 2 verified</div>
+              <div>Total Transactions: 11</div>
+              <div style="margin-top:4px;">
+                <a href="https://github.com/0xCaptain888/SkillDock/blob/main/deployment-results.json" target="_blank" style="color:var(--sol-blue);text-decoration:none;" data-i18n="proof_full">View full deployment log →</a>
+              </div>
+            </div>
+          </div>
+          <!-- END ON-CHAIN PROOF -->
+
         </div>
 
         <!-- PUBLISH TAB -->
@@ -2393,6 +2431,15 @@ const i18n = {
     step5_title: 'x402 Agent Payments',
     step5_desc: 'Agent-to-agent skill purchases via x402 payment protocol. Your agent can pay another agent\'s skill fee autonomously — enabling a true agent economy.',
     built_for: 'Built for Solana Mobile · Seeker',
+    // On-Chain Proof
+    proof_title: '🔗 On-Chain Proof (Solana Devnet)',
+    proof_desc: '11 verified transactions. Click to view on Solana Explorer.',
+    proof_collection: '⬡ SkillDock Collection NFT',
+    proof_x402: '◎ x402 Payment (0.8 SOL)',
+    proof_nft: '📦 NFT Transfer → Agent',
+    proof_a2a: '🤖 Agent-to-Agent (0.78 SOL)',
+    proof_summary: '📊 Deployment Summary',
+    proof_full: 'View full deployment log →',
     // Modal
     verified: '✓ Verified',
     modal_installs: 'Installs', modal_avg_earned: 'Avg Earned', modal_chain: 'Chain',
@@ -2557,6 +2604,15 @@ const i18n = {
     step5_title: 'x402 Agent 支付',
     step5_desc: '通过 x402 支付协议实现 Agent 间的技能购买。你的 Agent 可以自主支付另一个 Agent 的技能费用 — 构建真正的 Agent 经济。',
     built_for: '为 Solana Mobile · Seeker 而生',
+    // On-Chain Proof
+    proof_title: '🔗 链上证明 (Solana Devnet)',
+    proof_desc: '11 笔已验证交易。点击在 Solana Explorer 上查看。',
+    proof_collection: '⬡ SkillDock Collection NFT',
+    proof_x402: '◎ x402 支付 (0.8 SOL)',
+    proof_nft: '📦 NFT 转移 → Agent',
+    proof_a2a: '🤖 Agent 间支付 (0.78 SOL)',
+    proof_summary: '📊 部署摘要',
+    proof_full: '查看完整部署日志 →',
     // Modal
     verified: '✓ 已验证',
     modal_installs: '安装', modal_avg_earned: '平均收益', modal_chain: '链',

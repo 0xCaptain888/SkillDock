@@ -1,0 +1,158 @@
+{
+  "timestamp": "2026-03-31T06:12:37.301Z",
+  "network": "solana-devnet",
+  "wallets": {
+    "deployer": "72GpcKMdE7rKi13LiySyLTyLZF3VGvsG7WUFvMBNmFVq",
+    "agent": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
+    "creator": "BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn"
+  },
+  "transactions": [
+    {
+      "label": "Fund Creator (1 SOL from Deployer)",
+      "signature": "3RpHzzzEAHkse4ZbmnSikjVmB6J7yUdrDSYxT6rki49sdHFrW3vmqCHKv2B94cTDEGsVdd8KfNLwFxjSisr7Ed5F",
+      "explorer": "https://explorer.solana.com/tx/3RpHzzzEAHkse4ZbmnSikjVmB6J7yUdrDSYxT6rki49sdHFrW3vmqCHKv2B94cTDEGsVdd8KfNLwFxjSisr7Ed5F?cluster=devnet"
+    },
+    {
+      "label": "Mint SkillDock Collection NFT",
+      "signature": "4nRgU4B4Zoi58jRvMzS5cE2bVDyeAQ7cpSZCePY19CCQsAXULyBc2vdYsSez2cjRYdcWkXZ3HZ7SCCY6Dshqao52",
+      "explorer": "https://explorer.solana.com/tx/4nRgU4B4Zoi58jRvMzS5cE2bVDyeAQ7cpSZCePY19CCQsAXULyBc2vdYsSez2cjRYdcWkXZ3HZ7SCCY6Dshqao52?cluster=devnet"
+    },
+    {
+      "label": "Mint: Token Scanner Pro",
+      "signature": "2P27zgxeu1kdtBzysbeBiw39h57Dhu3usZrApKg4aaRCqvTd1uBhEgZio9HuNiFFKoqNUKtYbLCPVSxi8QC4vfYG",
+      "explorer": "https://explorer.solana.com/tx/2P27zgxeu1kdtBzysbeBiw39h57Dhu3usZrApKg4aaRCqvTd1uBhEgZio9HuNiFFKoqNUKtYbLCPVSxi8QC4vfYG?cluster=devnet"
+    },
+    {
+      "label": "Mint: Rug Shield",
+      "signature": "3hxjHuidzADsam8uzA9cXBSyXReqscxLhch9PvMutXEJaqJRuPCkcdN1Zg42QW1MUWy5tT825WeLgxnXVs7boPiW",
+      "explorer": "https://explorer.solana.com/tx/3hxjHuidzADsam8uzA9cXBSyXReqscxLhch9PvMutXEJaqJRuPCkcdN1Zg42QW1MUWy5tT825WeLgxnXVs7boPiW?cluster=devnet"
+    },
+    {
+      "label": "Mint: Smart Swap",
+      "signature": "3bd7x3qLDDaaQQ9dScnpc4hMQj8tvyQw7k9N2mMXoBrhNSHA1zgytpKv9danhTXsFTTkbSGb9ijg7x451F1iCJbf",
+      "explorer": "https://explorer.solana.com/tx/3bd7x3qLDDaaQQ9dScnpc4hMQj8tvyQw7k9N2mMXoBrhNSHA1zgytpKv9danhTXsFTTkbSGb9ijg7x451F1iCJbf?cluster=devnet"
+    },
+    {
+      "label": "Mint: Alpha Decoder",
+      "signature": "4BJeiVpbp4PBRuRZCLc8YnCEaAAe7zYwJjfzhaRuZsUifb7vXSie5WCGFj7izauvxfhi3DMMwfZYwQhaFACx88iX",
+      "explorer": "https://explorer.solana.com/tx/4BJeiVpbp4PBRuRZCLc8YnCEaAAe7zYwJjfzhaRuZsUifb7vXSie5WCGFj7izauvxfhi3DMMwfZYwQhaFACx88iX?cluster=devnet"
+    },
+    {
+      "label": "Mint: Whale Tracker",
+      "signature": "66mgL2x2ekRJzKShcuHzYftfCieLcjoHFfLJe6HyH5HSUgLp3LpAzVcdJy892QLAu4SJnrREbzhvJCMxo6rDePVv",
+      "explorer": "https://explorer.solana.com/tx/66mgL2x2ekRJzKShcuHzYftfCieLcjoHFfLJe6HyH5HSUgLp3LpAzVcdJy892QLAu4SJnrREbzhvJCMxo6rDePVv?cluster=devnet"
+    },
+    {
+      "label": "Mint: Sniper Bot",
+      "signature": "5eUqTfru2m7V6caXvgtEEctieY8bof92cJptg5CccYx1KbyqmUG2ga9W9hGdhSYaXTogyy7u1EFPYTNTCa9ZWjpv",
+      "explorer": "https://explorer.solana.com/tx/5eUqTfru2m7V6caXvgtEEctieY8bof92cJptg5CccYx1KbyqmUG2ga9W9hGdhSYaXTogyy7u1EFPYTNTCa9ZWjpv?cluster=devnet"
+    },
+    {
+      "label": "x402 Payment: Agent → Creator (0.8 SOL)",
+      "signature": "2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf",
+      "explorer": "https://explorer.solana.com/tx/2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf?cluster=devnet"
+    },
+    {
+      "label": "NFT Transfer: Rug Shield → Agent",
+      "signature": "4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ",
+      "explorer": "https://explorer.solana.com/tx/4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ?cluster=devnet"
+    },
+    {
+      "label": "x402 Agent-to-Agent: Alpha Decoder (0.78 SOL)",
+      "signature": "3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ",
+      "explorer": "https://explorer.solana.com/tx/3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ?cluster=devnet"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Token Scanner Pro",
+      "category": "Security",
+      "price": 0.5,
+      "mint": "5AeJjCnK2Ko1NvygL49oPpHNEyYrJWJup1WTmbpZ59tc",
+      "tokenAccount": "M5GsWHSZq5qNqpfKXzFr4hu5m6pVJ9Cd3d1yMzfrTvr",
+      "explorer": "https://explorer.solana.com/address/5AeJjCnK2Ko1NvygL49oPpHNEyYrJWJup1WTmbpZ59tc?cluster=devnet"
+    },
+    {
+      "name": "Rug Shield",
+      "category": "Security",
+      "price": 0.8,
+      "mint": "3btA8yCFhk3LgvpJmZEFKfySbHzeyJw3nKrCQkSt8cSL",
+      "tokenAccount": "Fa7LF3SGKpzsribw2hsoYzoc7meJ9j5ssBD7UvChMVoV",
+      "explorer": "https://explorer.solana.com/address/3btA8yCFhk3LgvpJmZEFKfySbHzeyJw3nKrCQkSt8cSL?cluster=devnet"
+    },
+    {
+      "name": "Smart Swap",
+      "category": "DeFi",
+      "price": 0.3,
+      "mint": "WS9KVUwiKS2jqMNoiNQ3UcNiLaNCtqZCooosF7pWfJ4",
+      "tokenAccount": "3V2zvhYGP2dsUTYn2hKYBiLa6kKwrQsCTgfhHxYeRhVs",
+      "explorer": "https://explorer.solana.com/address/WS9KVUwiKS2jqMNoiNQ3UcNiLaNCtqZCooosF7pWfJ4?cluster=devnet"
+    },
+    {
+      "name": "Alpha Decoder",
+      "category": "Analytics",
+      "price": 0.78,
+      "mint": "EgB5ieNWqqN9YxpxakPFT39WcU3LRsaU54j3XoEMpbzj",
+      "tokenAccount": "A39yL1DhHqRmL4RFoAZynZWXKkjipTVm5FaMeUSfZ17V",
+      "explorer": "https://explorer.solana.com/address/EgB5ieNWqqN9YxpxakPFT39WcU3LRsaU54j3XoEMpbzj?cluster=devnet"
+    },
+    {
+      "name": "Whale Tracker",
+      "category": "Analytics",
+      "price": 0.6,
+      "mint": "BoPV5WhypdaYGfwTKSyYhRVtt23X9TgzUhLRCuJ1WTSS",
+      "tokenAccount": "6FBPb1acP6ZV2NkLWLyoDTG6vqsmU5nmgwGvR7XzYUH6",
+      "explorer": "https://explorer.solana.com/address/BoPV5WhypdaYGfwTKSyYhRVtt23X9TgzUhLRCuJ1WTSS?cluster=devnet"
+    },
+    {
+      "name": "Sniper Bot",
+      "category": "Trading",
+      "price": 1.2,
+      "mint": "5UhegF7MCsfhrSPnkE1wB19r4Pzpzh13rziJ88ADVFNr",
+      "tokenAccount": "F6yfBZZ1NzJwTLoZrYuMv9RzWGPH55rVaK96pGa3mMnz",
+      "explorer": "https://explorer.solana.com/address/5UhegF7MCsfhrSPnkE1wB19r4Pzpzh13rziJ88ADVFNr?cluster=devnet"
+    }
+  ],
+  "collection": {
+    "mint": "EMZusfmM4DCJ8VzcYkHjK8FnppfYoBHZpPvC87KPJZvo",
+    "explorer": "https://explorer.solana.com/address/EMZusfmM4DCJ8VzcYkHjK8FnppfYoBHZpPvC87KPJZvo?cluster=devnet"
+  },
+  "x402Payments": [
+    {
+      "type": "skill_purchase",
+      "from": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
+      "to": "BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn",
+      "amount": 0.8,
+      "skill": "Rug Shield",
+      "signature": "2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf",
+      "explorer": "https://explorer.solana.com/tx/2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf?cluster=devnet"
+    },
+    {
+      "type": "agent_to_agent",
+      "from": "97LyBRjtKusWPM1XEMoQ5NP63mBGdGBfaqETuxhXFs3C",
+      "to": "BjGJJXUVLwvYDtfVR1YxiBMPLNU7hCHStF3pQUiV4KHn",
+      "amount": 0.78,
+      "skill": "Alpha Decoder",
+      "signature": "3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ",
+      "explorer": "https://explorer.solana.com/tx/3WnV8Pd2HyPSh8a3ezKcasCjoy7atj6QsRFQ4HhgQ97TPPfEDBxhvNWx4Xuav2i6h1DX73Kc8oVHxywahkRNkqeZ?cluster=devnet"
+    }
+  ],
+  "agentActions": [
+    {
+      "time": "2026-03-31T06:12:58.866Z",
+      "action": "THREAT_DETECTED",
+      "detail": "$FAKE — hidden mint function"
+    },
+    {
+      "time": "2026-03-31T06:13:00.899Z",
+      "action": "SKILL_ACQUIRED",
+      "skill": "Rug Shield",
+      "paymentTx": "2UsEhFU3BXVPSR8dn499pqMVQkRnQG3DwfGoF3Y3GCQm5BhdLPqKdUWoat5g8QrCcUowQYz464YXm3pYgn5ewJf",
+      "nftTx": "4nSq4KvJCTaHuTRAr4BZtVgpQYvyr5U9gzF2G8YbT3nLCkbyuKKMQvz7SHP6R7ooFNTNZnQ4eV8juDjo8UfP4EiJ"
+    }
+  ],
+  "finalBalances": {
+    "agent": "0.9200",
+    "creator": "2.5800"
+  }
+}

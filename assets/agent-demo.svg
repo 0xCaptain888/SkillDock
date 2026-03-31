@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="terminal" baseProfile="full" viewBox="0 0 847 1016" width="847" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="terminal" baseProfile="full" viewBox="0 0 887 1186" width="887" version="1.1">
     <defs>
         <termtosvg:template_settings xmlns:termtosvg="https://github.com/nbedos/termtosvg">
-            <termtosvg:screen_geometry columns="100" rows="55"/>
+            <termtosvg:screen_geometry columns="105" rows="65"/>
             <termtosvg:animation type="css"/>
         </termtosvg:template_settings>
         <style type="text/css" id="generated-style"><![CDATA[#screen {
@@ -60,5 +60,5 @@
     <circle cx="24" cy="23" r="7" class="color1"/>
     <circle cx="44" cy="23" r="7" class="color3"/>
     <circle cx="64" cy="23" r="7" class="color2"/>
-    <svg id="screen" width="800" height="935" x="23" y="50" viewBox="0 0 800 935" preserveAspectRatio="xMidYMin slice"><rect class="background" height="100%" width="100%" x="0" y="0"/><defs><g id="g1"><text x="0" textLength="8" class="background"> </text></g></defs><g id="screen_view"><g><rect x="0" y="0" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="0"/></g></g></svg>
+    <svg id="screen" width="840" height="1105" x="23" y="50" viewBox="0 0 840 1105" preserveAspectRatio="xMidYMin slice"><rect class="background" height="100%" width="100%" x="0" y="0"/><defs><g id="g1"><text x="0" textLength="8" class="background"> </text></g></defs><g id="screen_view"><g><rect x="0" y="0" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="0"/></g></g></svg>
 </svg>

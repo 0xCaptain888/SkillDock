@@ -155,6 +155,7 @@ After NFT ownership is verified, the agent dynamically loads and executes the co
 | Skill Module | Analysis Type | Output |
 |-------------|---------------|--------|
 | `rug-shield.mjs` | Contract risk heuristics (5 checks: hidden mint, honeypot, LP lock, ownership, proxy) | `{ riskLevel, score: 0-100, findings[] }` |
+| `snipe-guard.mjs` | MEV/sandwich attack detection (5 checks: slippage, trade size, mempool, hotspot, liquidity) | `{ riskLevel, score: 0-100, findings[] }` |
 | `alpha-decoder.mjs` | On-chain alpha signals (4 indicators: whale flow, volume, smart money, social) | `{ signal, confidence: 0-1, indicators[] }` |
 
 Each module implements `static describe()` returning SAP-1 compatible metadata and `analyze(data)` for execution.

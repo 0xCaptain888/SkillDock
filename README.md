@@ -203,8 +203,13 @@ Threat Detected ($FAKE hidden mint function)
 Threat Detected ($SCAM honeypot — sell restriction)
   → LLM Guardian: L1=PASS L2=PASS(0.98) L3=PASS → APPROVED
   → x402 Payment: 0.65 SOL → Creator wallet (confirmed)
-  → Snipe Guard installed → Honeypot BLOCKED
-  → Saved 1.5 SOL | Cost 0.65 SOL | Net +0.85 SOL
+  → Snipe Guard installed → SnipeGuardSkill.analyze() executed:
+      Risk: CRITICAL (100/100)
+      [CRITICAL] HIGH_SLIPPAGE: 12% tolerance — sandwich bots extract full spread
+      [HIGH]     MEMPOOL_EXPOSED: Low priority fee, easily front-runnable
+      [CRITICAL] SANDWICH_HOTSPOT: 7 attacks in last hour on this pool
+      [MEDIUM]   LOW_LIQUIDITY: Pool $35k — trivially manipulable
+  → Transaction BLOCKED. Saved 1.5 SOL | Cost 0.65 SOL | Net +0.85 SOL
 
 Proactive: Alpha Signal Detection
   → LLM Guardian: L1=PASS L2=PASS(0.98) L3=PASS → APPROVED
@@ -261,8 +266,8 @@ Seeker Users → Run Agents → Agents buy skills from SkillDock (SOL flows)
 | **x402 Protocol** | Agent autonomous payments |
 | **Solana Mobile (Seeker)** | Mobile-native distribution |
 | **Anchor** | On-chain SkillRegistry program |
-| **Jupiter** | DEX aggregation for cross-token skill payments (future integration) |
-| **Marinade** | Agent earnings → mSOL staking → stake rewards fund more skill purchases (ecosystem flywheel) |
+| **Jupiter** | DEX aggregation for cross-token skill payments *(planned)* |
+| **Marinade** | Agent earnings → mSOL staking → stake rewards fund more skill purchases *(planned)* |
 
 ---
 
@@ -296,6 +301,7 @@ SkillDock/
 │   ├── llm-guardian.mjs       # Triple-layer LLM hallucination protection (Groq API + fallback)
 │   └── skills/
 │       ├── rug-shield.mjs     # Executable: rug-pull detection heuristics (5 checks)
+│       ├── snipe-guard.mjs    # Executable: MEV/sandwich attack detection (5 checks)
 │       └── alpha-decoder.mjs  # Executable: alpha signal detection (4 indicators)
 ├── tests/
 │   └── run-tests.mjs          # 19 automated tests (Merkle + Guardian + regression)
@@ -331,6 +337,7 @@ node agent-demo.mjs
 
 # Run individual skill modules
 node src/skills/rug-shield.mjs
+node src/skills/snipe-guard.mjs
 node src/skills/alpha-decoder.mjs
 
 # Run with real LLM (optional — works without)

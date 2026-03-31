@@ -16,11 +16,13 @@ import { SkillMetadataVerifier, SKILLDOCK_SKILLS, MerkleTree } from './src/merkl
 import { LLMGuardian } from './src/llm-guardian.mjs';
 import { RugShieldSkill } from './src/skills/rug-shield.mjs';
 import { AlphaDecoderSkill } from './src/skills/alpha-decoder.mjs';
+import { SnipeGuardSkill } from './src/skills/snipe-guard.mjs';
 
 // Executable skill modules — loaded after NFT ownership verified
 const SKILL_MODULES = {
   'sk-rug-shield': RugShieldSkill,
   'sk-alpha-decoder': AlphaDecoderSkill,
+  'sk-snipe-guard': SnipeGuardSkill,
 };
 
 // ================================================
@@ -73,6 +75,7 @@ const THREAT_SCENARIOS = [
     requiredSkillTags: ['mev-protection', 'sandwich-block', 'front-run-defense'],
     need: 'I need MEV protection and sandwich attack defense for DEX trading',
     contractData: { hasMintFunction: false, maxSellPct: 0, sellTaxPct: 45, lpLocked: true, lpLockDays: 30, ownerRenounced: false, isProxy: true },
+    txData: { dexRouter: 'Raydium', slippagePct: 12, poolLiquidityUsd: 35000, tradeAmountUsd: 2500, mempoolVisible: true, priorityFee: 5000, recentSandwiches: 7 },
   },
 ];
 
@@ -332,9 +335,10 @@ class SkillDockAgent {
 
       // Execute the actual skill module if available
       const SkillModule = SKILL_MODULES[best.id];
-      if (SkillModule && threat.contractData) {
+      const inputData = threat.txData || threat.contractData;
+      if (SkillModule && inputData) {
         const skill = new SkillModule();
-        const analysis = skill.analyze(threat.contractData);
+        const analysis = skill.analyze(inputData);
         this.record('PROTECT', `"${best.name}" analyzing ${threat.token}... → Risk: ${analysis.riskLevel} (${analysis.score}/100)`);
         analysis.findings.forEach(f => {
           this.record('PROTECT', `  [${f.severity}] ${f.id}: ${f.detail}`);

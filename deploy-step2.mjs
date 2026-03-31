@@ -3,7 +3,17 @@
  *
  * Run AFTER funding the 3 wallets from step 1.
  * Reads keypairs from .keypairs.json
+ *
+ * Proxy support: set https_proxy=http://127.0.0.1:PORT before running
  */
+
+// --- Proxy setup (must be BEFORE other imports) ---
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
+const proxyUrl = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
+if (proxyUrl) {
+  console.log(`  🌐 Using proxy: ${proxyUrl}`);
+  setGlobalDispatcher(new ProxyAgent(proxyUrl));
+}
 
 import {
   Connection, Keypair, LAMPORTS_PER_SOL, PublicKey,

@@ -212,7 +212,7 @@ Three independent verification layers. All must pass.
 
 ## Cost Optimization
 
-**Dual-Model Router** saves 33.5% inference cost per session:
+**Dual-Model Router** saves 46% inference cost per session:
 
 | Query Type | Model | Relative Cost | Use Case |
 |-----------|-------|---------------|----------|

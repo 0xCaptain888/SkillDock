@@ -26,6 +26,12 @@ jobs:
       - name: Run LLM Guardian
         run: node src/llm-guardian.mjs
 
+      - name: Run Executable Skills
+        run: |
+          node src/skills/rug-shield.mjs
+          node src/skills/snipe-guard.mjs
+          node src/skills/alpha-decoder.mjs
+
       - name: Run Agent Integration Demo
         run: node agent-demo.mjs
 

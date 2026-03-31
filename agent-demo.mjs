@@ -266,7 +266,11 @@ class SkillDockAgent {
       await this.delay(300);
     }
 
-    // Phase 5: Summary
+    // Phase 5: Guardian BLOCK demonstration — agent tries to buy overpriced skill
+    await this.handleBlockDemo();
+    await this.delay(200);
+
+    // Phase 6: Summary
     console.log('  ──────┴────────────────────────────────────────────────────');
     console.log('');
     console.log('  📊 Session Summary');
@@ -393,6 +397,53 @@ class SkillDockAgent {
       }
     }
   }
+  async handleBlockDemo() {
+    console.log('');
+    console.log('  ──────┼────────────────────────────────────────────────────');
+    console.log('  ⛔ Guardian BLOCK Demonstration');
+    console.log('  ──────┼────────────────────────────────────────────────────');
+
+    // Simulate agent encountering an overpriced, low-reputation skill
+    const suspiciousSkill = {
+      id: 'sk-super-scanner-9000',
+      name: 'Super Scanner 9000',
+      category: 'security',
+      price: 4.5,
+      rating: 3.2,
+      installs: 45,
+      acquisitions: 45,
+      tags: ['rug-protection'],
+      description: 'Claims to detect all scams with 100% accuracy using proprietary AI.',
+      capability_type: 'security',
+      status: 'active',
+      version: '0.1.0',
+      creator: 'UnKnOwN...xYz',
+    };
+
+    this.record('SCAN', 'Agent discovers promoted skill: "Super Scanner 9000" (4.5 SOL)');
+    this.record('EVALUATE', `"${suspiciousSkill.name}" — ${suspiciousSkill.installs} installs, ★${suspiciousSkill.rating}, ${suspiciousSkill.price} SOL`);
+    this.record('EVALUATE', 'Red flags: overpriced (4.5 SOL vs 0.7 median), low installs (45), low rating (3.2)');
+    await this.delay(200);
+
+    // Run through Guardian — expect BLOCK at Layer 1
+    const agentState = { remainingBudget: this.balance };
+    const guardianResult = await this.guardian.evaluatePurchase(
+      'I need advanced rug pull scanning',
+      suspiciousSkill,
+      agentState,
+    );
+    this.guardianResults.push({ skill: suspiciousSkill.name, ...guardianResult });
+
+    const l1 = guardianResult.layers.layer1;
+    const l2 = guardianResult.layers.layer2;
+    const l3 = guardianResult.layers.layer3;
+    this.record('GUARDIAN_L1', `Deterministic Rules: ${l1.pass ? 'PASS' : 'FAIL'} (${l1.score.toFixed(2)}) — price anomaly / reputation / budget`);
+    this.record('GUARDIAN_L2', `LLM Evaluation:     ${l2.pass ? 'PASS' : 'FAIL'} (${l2.score.toFixed(2)})`);
+    this.record('GUARDIAN_L3', `On-Chain Verify:    ${l3.pass ? 'PASS' : 'FAIL'} (${l3.score.toFixed(2)})`);
+    this.record('GUARDIAN', `BLOCKED: ${guardianResult.reasoning}`);
+    this.record('RESULT', `Guardian saved agent from purchasing overpriced skill (${suspiciousSkill.price} SOL). Budget preserved.`);
+  }
+
   delay(ms) {
     return new Promise(r => setTimeout(r, ms));
   }

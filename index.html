@@ -1814,6 +1814,7 @@ select.pub-input {
       <span class="badge green" data-i18n="badge_onchain">⬡ On-Chain Skills</span>
       <span class="badge" data-i18n="badge_seeker">📱 Seeker Native</span>
       <span class="badge" data-i18n="badge_agent">🤖 Agent-First</span>
+      <span class="badge" data-i18n="badge_guardian">🔒 LLM Guardian</span>
     </div>
   </div>
 
@@ -2031,11 +2032,13 @@ select.pub-input {
             <div class="arch-layers">
               <div class="arch-layer l1" data-i18n="arch_layer1">📱 Seeker Mobile — Agent Runtime</div>
               <div class="arch-arrow">↕</div>
-              <div class="arch-layer l2" data-i18n="arch_layer2">⚡ SkillDock SDK — Discovery & Install</div>
+              <div class="arch-layer l2" data-i18n="arch_layer2">🔒 LLM Guardian — Triple-Layer Verification</div>
               <div class="arch-arrow">↕</div>
-              <div class="arch-layer l3" data-i18n="arch_layer3">⬡ Skill NFT Program — On-Chain Registry</div>
+              <div class="arch-layer l3" data-i18n="arch_layer3">⚡ SkillDock SDK — Discovery & Install</div>
               <div class="arch-arrow">↕</div>
-              <div class="arch-layer l4" data-i18n="arch_layer4">◎ Solana L1 — Settlement & Ownership</div>
+              <div class="arch-layer l4" data-i18n="arch_layer4">⬡ Skill NFT Program — On-Chain Registry + Merkle</div>
+              <div class="arch-arrow">↕</div>
+              <div class="arch-layer l4" data-i18n="arch_layer5">◎ Solana L1 — Settlement & Ownership</div>
             </div>
           </div>
 
@@ -2074,15 +2077,29 @@ select.pub-input {
               <p data-i18n="step5_desc">Agent-to-agent skill purchases via x402 payment protocol. Your agent can pay another agent's skill fee autonomously — enabling a true agent economy.</p>
             </div>
           </div>
+          <div class="hiw-step">
+            <div class="hiw-num">6</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step6_title">LLM Guardian (Triple-Layer)</h4>
+              <p data-i18n="step6_desc">Every purchase passes 3 independent checks: Layer 1 deterministic rules (budget, blacklist, price anomaly), Layer 2 LLM evaluation (Groq API, confidence threshold), Layer 3 on-chain verification (Merkle proof, NFT status). All must pass or purchase is blocked.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">7</div>
+            <div class="hiw-body">
+              <h4 data-i18n="step7_title">Executable Skill Modules</h4>
+              <p data-i18n="step7_desc">Skills are not just NFTs — they contain real executable code. Rug Shield (5 heuristic checks), Snipe Guard (5 MEV checks), Alpha Decoder (4 signal indicators). After NFT ownership is verified, the agent loads and runs the skill module.</p>
+            </div>
+          </div>
 
           <div class="tech-badges">
             <span class="tech-badge">Solana</span>
             <span class="tech-badge">Metaplex NFT</span>
             <span class="tech-badge">x402</span>
             <span class="tech-badge">Seeker SDK</span>
-            <span class="tech-badge">MCP</span>
-            <span class="tech-badge">OpenClaw</span>
-            <span class="tech-badge">Jupiter</span>
+            <span class="tech-badge">LLM Guardian</span>
+            <span class="tech-badge">Merkle Tree</span>
+            <span class="tech-badge">Groq API</span>
             <span class="tech-badge">Anchor</span>
           </div>
 
@@ -2381,6 +2398,7 @@ const i18n = {
     badge_onchain: '⬡ On-Chain Skills',
     badge_seeker: '📱 Seeker Native',
     badge_agent: '🤖 Agent-First',
+    badge_guardian: '🔒 LLM Guardian',
     // Discover
     discover_subtitle: 'Agent Skill Store · Solana Mobile',
     search_placeholder: 'Search skills, agents, creators...',
@@ -2417,9 +2435,10 @@ const i18n = {
     arch_title: '⬡ Architecture',
     arch_subtitle: 'How SkillDock works on-chain',
     arch_layer1: '📱 Seeker Mobile — Agent Runtime',
-    arch_layer2: '⚡ SkillDock SDK — Discovery & Install',
-    arch_layer3: '⬡ Skill NFT Program — On-Chain Registry',
-    arch_layer4: '◎ Solana L1 — Settlement & Ownership',
+    arch_layer2: '🔒 LLM Guardian — Triple-Layer Verification',
+    arch_layer3: '⚡ SkillDock SDK — Discovery & Install',
+    arch_layer4: '⬡ Skill NFT Program — On-Chain Registry + Merkle',
+    arch_layer5: '◎ Solana L1 — Settlement & Ownership',
     step1_title: 'Skills as NFTs',
     step1_desc: 'Each AI skill is minted as a Metaplex NFT. Ownership grants your agent the ability to execute that skill. Transfer, sell, or compose skills freely.',
     step2_title: 'Mobile-Native Distribution',
@@ -2430,6 +2449,10 @@ const i18n = {
     step4_desc: 'Skill creators earn SOL on every install. On-chain royalties via Metaplex. Revenue sharing for composable skill bundles.',
     step5_title: 'x402 Agent Payments',
     step5_desc: 'Agent-to-agent skill purchases via x402 payment protocol. Your agent can pay another agent\'s skill fee autonomously — enabling a true agent economy.',
+    step6_title: 'LLM Guardian (Triple-Layer)',
+    step6_desc: 'Every purchase passes 3 independent checks: Layer 1 deterministic rules (budget, blacklist, price anomaly), Layer 2 LLM evaluation (Groq API, confidence threshold), Layer 3 on-chain verification (Merkle proof, NFT status). All must pass or purchase is blocked.',
+    step7_title: 'Executable Skill Modules',
+    step7_desc: 'Skills are not just NFTs — they contain real executable code. Rug Shield (5 heuristic checks), Snipe Guard (5 MEV checks), Alpha Decoder (4 signal indicators). After NFT ownership is verified, the agent loads and runs the skill module.',
     built_for: 'Built for Solana Mobile · Seeker',
     // On-Chain Proof
     proof_title: '🔗 On-Chain Proof (Solana Devnet)',
@@ -2554,6 +2577,7 @@ const i18n = {
     badge_onchain: '⬡ 链上技能',
     badge_seeker: '📱 Seeker 原生',
     badge_agent: '🤖 Agent 优先',
+    badge_guardian: '🔒 LLM Guardian',
     // Discover
     discover_subtitle: 'Agent 技能商店 · Solana Mobile',
     search_placeholder: '搜索技能、Agent、创作者...',
@@ -2590,9 +2614,10 @@ const i18n = {
     arch_title: '⬡ 技术架构',
     arch_subtitle: 'SkillDock 链上工作原理',
     arch_layer1: '📱 Seeker 手机 — Agent 运行时',
-    arch_layer2: '⚡ SkillDock SDK — 发现与安装',
-    arch_layer3: '⬡ 技能 NFT 程序 — 链上注册表',
-    arch_layer4: '◎ Solana L1 — 结算与所有权',
+    arch_layer2: '🔒 LLM Guardian — 三层验证',
+    arch_layer3: '⚡ SkillDock SDK — 发现与安装',
+    arch_layer4: '⬡ 技能 NFT 程序 — 链上注册表 + Merkle',
+    arch_layer5: '◎ Solana L1 — 结算与所有权',
     step1_title: '技能即 NFT',
     step1_desc: '每个 AI 技能都铸造为 Metaplex NFT。拥有即授权你的 Agent 执行该技能。自由转让、出售或组合技能。',
     step2_title: '移动原生分发',
@@ -2603,6 +2628,10 @@ const i18n = {
     step4_desc: '技能创作者在每次安装时赚取 SOL。通过 Metaplex 实现链上版税。可组合技能包的收入共享。',
     step5_title: 'x402 Agent 支付',
     step5_desc: '通过 x402 支付协议实现 Agent 间的技能购买。你的 Agent 可以自主支付另一个 Agent 的技能费用 — 构建真正的 Agent 经济。',
+    step6_title: 'LLM Guardian（三层验证）',
+    step6_desc: '每笔购买经过 3 层独立检查：第 1 层确定性规则（预算、黑名单、价格异常），第 2 层 LLM 评估（Groq API + 置信阈值），第 3 层链上验证（Merkle 证明、NFT 状态）。任一层不通过即拦截。',
+    step7_title: '可执行技能模块',
+    step7_desc: '技能不仅是 NFT — 它们包含真实可执行代码。Rug Shield（5 项启发式检查）、Snipe Guard（5 项 MEV 检查）、Alpha Decoder（4 项信号指标）。NFT 所有权验证后，Agent 加载并运行技能模块。',
     built_for: '为 Solana Mobile · Seeker 而生',
     // On-Chain Proof
     proof_title: '🔗 链上证明 (Solana Devnet)',

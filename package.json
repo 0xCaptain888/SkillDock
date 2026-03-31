@@ -1,5 +1,37 @@
 {
+  "name": "skilldock",
+  "version": "1.0.0",
+  "description": "The App Store for AI Agents on Solana — skills as NFTs, autonomous acquisition via x402, SAP-1 protocol",
   "type": "module",
+  "main": "agent-demo.mjs",
+  "scripts": {
+    "demo": "node agent-demo.mjs",
+    "test": "node tests/run-tests.mjs",
+    "merkle": "node src/merkle-verifier.mjs",
+    "guardian": "node src/llm-guardian.mjs",
+    "skills": "node src/skills/rug-shield.mjs && node src/skills/snipe-guard.mjs && node src/skills/alpha-decoder.mjs",
+    "deploy:keys": "node deploy-step1.mjs",
+    "deploy:full": "node deploy-step2.mjs"
+  },
+  "keywords": [
+    "solana",
+    "ai-agents",
+    "nft",
+    "x402",
+    "skill-marketplace",
+    "solana-mobile",
+    "anchor",
+    "metaplex",
+    "agent-economy",
+    "sap-1"
+  ],
+  "author": "0xCaptain888",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xCaptain888/SkillDock.git"
+  },
+  "homepage": "https://0xcaptain888.github.io/SkillDock/",
   "dependencies": {
     "global-agent": "^4.1.3",
     "https-proxy-agent": "^8.0.0",

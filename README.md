@@ -222,6 +222,18 @@ Session Summary:
   Skills Acquired: 3 (Rug Shield + Snipe Guard + Alpha Decoder)
   Total Spent: 2.23 SOL | Remaining: 0.77 SOL
   Threats Blocked: 2 | Loss Avoided: 4.7 SOL | Net ROI: +2.47 SOL
+
+Guardian BLOCK Demonstration:
+  → Agent encounters promoted skill: "Super Scanner 9000" (4.5 SOL)
+  → Red flags: overpriced (4.5 vs 0.7 median), 45 installs, ★3.2
+  → LLM Guardian: L1=FAIL (price anomaly + low reputation) → BLOCKED
+  → Agent saved 4.5 SOL. Budget preserved.
+
+Guardian Decisions:
+  ✅ APPROVED  Rug Shield      L1=PASS L2=PASS L3=PASS
+  ✅ APPROVED  Snipe Guard     L1=PASS L2=PASS L3=PASS
+  ✅ APPROVED  Alpha Decoder   L1=PASS L2=PASS L3=PASS
+  ❌ BLOCKED   Super Scanner   L1=FAIL L2=FAIL L3=FAIL
 ```
 
 See [`agent-execution-log.json`](./agent-execution-log.json) for the complete execution trace.
@@ -304,7 +316,7 @@ SkillDock/
 │       ├── snipe-guard.mjs    # Executable: MEV/sandwich attack detection (5 checks)
 │       └── alpha-decoder.mjs  # Executable: alpha signal detection (4 indicators)
 ├── tests/
-│   └── run-tests.mjs          # 19 automated tests (Merkle + Guardian + regression)
+│   └── run-tests.mjs          # 33 automated tests (Merkle + Guardian + Skills + BLOCK scenarios)
 ├── docs/
 │   ├── ARCHITECTURE.md        # Technical architecture deep-dive
 │   └── ENGINEERING_LOG.md     # Debugging postmortems
@@ -349,7 +361,7 @@ node src/merkle-verifier.mjs
 # Run LLM Guardian demo
 node src/llm-guardian.mjs
 
-# Run test suite (19 tests)
+# Run test suite (33 tests)
 node tests/run-tests.mjs
 
 # Serve interactive demo

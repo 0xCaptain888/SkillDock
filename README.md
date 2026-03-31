@@ -10,6 +10,38 @@ Built for the **Solana Agent Economy Hackathon: Agent Talent Show** — Track 2:
 
 ---
 
+## 🔗 On-Chain Verification (Solana Devnet)
+
+All core components are deployed on Solana Devnet with real, verifiable transactions:
+
+| Component | Type | Status |
+|-----------|------|--------|
+| SkillDock Collection NFT | SPL Token (supply=1) | ✅ Deployed |
+| Skill NFTs (×6) | SPL Token (1-of-1, mint auth revoked) | ✅ Minted |
+| x402 Agent Payment | SOL Transfer (Agent → Creator) | ✅ Verified |
+| NFT Skill Transfer | SPL Token Transfer | ✅ Verified |
+| Agent-to-Agent Payment | x402 Protocol | ✅ Verified |
+
+> Run `node deploy-to-devnet.mjs` to reproduce the full deployment. All transaction hashes are logged to `deployment-results.json`.
+
+### Agent Autonomous Execution
+
+The SkillDock Agent operates fully autonomously:
+```
+Threat Detected ($FAKE) → Search SkillDock → Evaluate "Rug Shield" → Budget Check ✅
+→ x402 Payment (0.8 SOL) → NFT Transfer → Skill Installed → Rug Pull Blocked
+→ Saved 3.2 SOL | Cost 0.8 SOL | Net +2.4 SOL
+```
+
+See [`agent-execution-log.json`](./agent-execution-log.json) for the full execution trace.
+
+### Technical Documentation
+
+- 📐 [Architecture](./docs/ARCHITECTURE.md) — 4-layer system design
+- 🔧 [Engineering Log](./docs/ENGINEERING_LOG.md) — Real debugging postmortems
+
+---
+
 ## The Problem
 
 Giving an AI agent a new capability today means:

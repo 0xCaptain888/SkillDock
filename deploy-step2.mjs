@@ -1,13 +1,8 @@
 /**
- * SkillDock — Solana Devnet Deployment
+ * SkillDock — Step 2: Deploy to Devnet
  *
- * Creates real on-chain assets:
- * 1. SkillDock Collection NFT (SPL Token)
- * 2. 6 individual Skill NFTs
- * 3. Agent auto-acquire demo (SOL payment + NFT transfer)
- * 4. Agent-to-Agent x402 payment
- *
- * All transactions verifiable on Solana Explorer.
+ * Run AFTER funding the 3 wallets from step 1.
+ * Reads keypairs from .keypairs.json
  */
 
 import {
@@ -20,16 +15,21 @@ import {
 } from '@solana/spl-token';
 import fs from 'fs';
 
-// --- Config ---
 const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// --- Keypairs ---
-const deployer = Keypair.generate();
-const agentWallet = Keypair.generate();
-const creatorWallet = Keypair.generate();
+// Load keypairs from step 1
+if (!fs.existsSync('.keypairs.json')) {
+  console.error('❌ .keypairs.json not found. Run deploy-step1.mjs first.');
+  process.exit(1);
+}
 
-// --- Results tracker ---
+const kp = JSON.parse(fs.readFileSync('.keypairs.json', 'utf-8'));
+const deployer = Keypair.fromSecretKey(Uint8Array.from(kp.deployer));
+const agentWallet = Keypair.fromSecretKey(Uint8Array.from(kp.agent));
+const creatorWallet = Keypair.fromSecretKey(Uint8Array.from(kp.creator));
+
+// Results tracker
 const results = {
   timestamp: new Date().toISOString(),
   network: 'solana-devnet',
@@ -52,29 +52,6 @@ function log(label, sig) {
   console.log(`     ${url}`);
 }
 
-// --- Airdrop with retries ---
-async function airdrop(wallet, sol) {
-  const label = wallet.publicKey.toBase58().slice(0, 8);
-  console.log(`  💰 Requesting ${sol} SOL for ${label}...`);
-  for (let i = 0; i < 8; i++) {
-    try {
-      const sig = await connection.requestAirdrop(wallet.publicKey, sol * LAMPORTS_PER_SOL);
-      await connection.confirmTransaction(sig, 'confirmed');
-      log(`Airdrop ${sol} SOL → ${label}`, sig);
-      await sleep(1500);
-      return;
-    } catch (e) {
-      if (i < 7) {
-        console.log(`     ⏳ Rate limited, retry ${i+1}/8 in ${(i+1)*3}s...`);
-        await sleep((i + 1) * 3000);
-      } else {
-        throw new Error(`Airdrop failed after 8 attempts. Try again in a few minutes.`);
-      }
-    }
-  }
-}
-
-// --- Skills definition ---
 const SKILLS = [
   { name: 'Token Scanner Pro', category: 'Security', price: 0.5 },
   { name: 'Rug Shield', category: 'Security', price: 0.8 },
@@ -84,20 +61,30 @@ const SKILLS = [
   { name: 'Sniper Bot', category: 'Trading', price: 1.2 },
 ];
 
-// ========== MAIN ==========
 async function main() {
   console.log('');
-  console.log('⚡ SkillDock — Solana Devnet Deployment');
-  console.log('========================================');
+  console.log('⚡ SkillDock — Solana Devnet Deployment (Step 2)');
+  console.log('=================================================');
 
-  // STEP 1: Fund wallets
-  console.log('\n📌 Step 1: Fund wallets\n');
-  await airdrop(deployer, 2);
-  await airdrop(agentWallet, 2);
-  await airdrop(creatorWallet, 1);
+  // Check balances first
+  console.log('\n📌 Checking wallet balances...\n');
+  const depBal = await connection.getBalance(deployer.publicKey);
+  const agentBal = await connection.getBalance(agentWallet.publicKey);
+  const creatorBal = await connection.getBalance(creatorWallet.publicKey);
 
-  // STEP 2: Create Collection NFT
-  console.log('\n📌 Step 2: Create SkillDock Collection\n');
+  console.log(`  Deployer: ${(depBal / LAMPORTS_PER_SOL).toFixed(2)} SOL`);
+  console.log(`  Agent:    ${(agentBal / LAMPORTS_PER_SOL).toFixed(2)} SOL`);
+  console.log(`  Creator:  ${(creatorBal / LAMPORTS_PER_SOL).toFixed(2)} SOL`);
+
+  if (depBal < 1.5 * LAMPORTS_PER_SOL || agentBal < 1.5 * LAMPORTS_PER_SOL || creatorBal < 0.5 * LAMPORTS_PER_SOL) {
+    console.log('\n❌ Insufficient balance. Please fund the wallets first:');
+    console.log('   Go to https://faucet.solana.com and airdrop to the addresses from step 1.');
+    process.exit(1);
+  }
+  console.log('\n  ✅ All wallets funded!\n');
+
+  // STEP 1: Create Collection NFT
+  console.log('📌 Step 1: Create SkillDock Collection\n');
   const collectionMint = await createMint(connection, deployer, deployer.publicKey, deployer.publicKey, 0);
   const collectionATA = await getOrCreateAssociatedTokenAccount(connection, deployer, collectionMint, deployer.publicKey);
   const colSig = await mintTo(connection, deployer, collectionMint, collectionATA.address, deployer, 1);
@@ -107,8 +94,8 @@ async function main() {
     explorer: `https://explorer.solana.com/address/${collectionMint.toBase58()}?cluster=devnet`,
   };
 
-  // STEP 3: Mint Skill NFTs
-  console.log('\n📌 Step 3: Mint 6 Skill NFTs\n');
+  // STEP 2: Mint Skill NFTs
+  console.log('\n📌 Step 2: Mint 6 Skill NFTs\n');
   for (const skill of SKILLS) {
     const skillMint = await createMint(connection, deployer, deployer.publicKey, deployer.publicKey, 0);
     const creatorATA = await getOrCreateAssociatedTokenAccount(connection, deployer, skillMint, creatorWallet.publicKey);
@@ -131,21 +118,17 @@ async function main() {
     await sleep(500);
   }
 
-  // STEP 4: Agent Auto-Acquire (the key demo)
-  console.log('\n📌 Step 4: Agent Auto-Acquire Demo\n');
+  // STEP 3: Agent Auto-Acquire
+  console.log('\n📌 Step 3: Agent Auto-Acquire Demo\n');
   const rugShield = results.skills.find(s => s.name === 'Rug Shield');
 
-  // 4a: Agent detects threat
-  const action1 = { time: new Date().toISOString(), action: 'THREAT_DETECTED', detail: 'Suspicious token $FAKE — hidden mint function in contract' };
-  results.agentActions.push(action1);
+  results.agentActions.push({ time: new Date().toISOString(), action: 'THREAT_DETECTED', detail: 'Suspicious token $FAKE — hidden mint function' });
   console.log('  🚨 Agent detected: suspicious token $FAKE');
 
-  // 4b: Agent searches SkillDock
-  const action2 = { time: new Date().toISOString(), action: 'SKILL_SEARCH', query: 'security rug-detection', result: 'Rug Shield (0.8 SOL)' };
-  results.agentActions.push(action2);
+  results.agentActions.push({ time: new Date().toISOString(), action: 'SKILL_SEARCH', query: 'security rug-detection', result: 'Rug Shield (0.8 SOL)' });
   console.log('  🔍 Agent searching SkillDock → found "Rug Shield"');
 
-  // 4c: x402 payment (SOL transfer)
+  // x402 payment
   const payTx = new Transaction().add(
     SystemProgram.transfer({
       fromPubkey: agentWallet.publicKey,
@@ -165,26 +148,21 @@ async function main() {
     explorer: `https://explorer.solana.com/tx/${paySig}?cluster=devnet`,
   });
 
-  // 4d: NFT transfer (creator → agent)
+  // NFT transfer
   const rugMint = new PublicKey(rugShield.mint);
   const agentATA = await getOrCreateAssociatedTokenAccount(connection, deployer, rugMint, agentWallet.publicKey);
-  const creatorATA = new PublicKey(rugShield.tokenAccount);
-  const nftTx = new Transaction().add(createTransferInstruction(creatorATA, agentATA.address, creatorWallet.publicKey, 1));
+  const creatorATA2 = new PublicKey(rugShield.tokenAccount);
+  const nftTx = new Transaction().add(createTransferInstruction(creatorATA2, agentATA.address, creatorWallet.publicKey, 1));
   const nftSig = await sendAndConfirmTransaction(connection, nftTx, [creatorWallet]);
   log('NFT Transfer: Rug Shield → Agent', nftSig);
 
-  const action3 = { time: new Date().toISOString(), action: 'SKILL_ACQUIRED', skill: 'Rug Shield', cost: rugShield.price, paymentTx: paySig, nftTx: nftSig };
-  results.agentActions.push(action3);
+  results.agentActions.push({ time: new Date().toISOString(), action: 'SKILL_ACQUIRED', skill: 'Rug Shield', cost: rugShield.price, paymentTx: paySig, nftTx: nftSig });
   console.log('  📦 Agent acquired Rug Shield NFT');
-
-  // 4e: Agent uses skill
-  const action4 = { time: new Date().toISOString(), action: 'RUG_PULL_BLOCKED', token: '$FAKE', threat: 'Hidden mint function', potentialLoss: 3.2, saved: 3.2 - rugShield.price };
-  results.agentActions.push(action4);
   console.log(`  🛡️ Rug Shield activated → blocked $FAKE rug pull`);
-  console.log(`  💰 Saved 3.2 SOL, skill cost ${rugShield.price} SOL → net +${(3.2 - rugShield.price).toFixed(1)} SOL`);
+  console.log(`  💰 Saved 3.2 SOL, cost ${rugShield.price} SOL → net +${(3.2 - rugShield.price).toFixed(1)} SOL`);
 
-  // STEP 5: Second x402 payment (Agent-to-Agent)
-  console.log('\n📌 Step 5: Agent-to-Agent x402 Payment\n');
+  // STEP 4: Agent-to-Agent x402 payment
+  console.log('\n📌 Step 4: Agent-to-Agent x402 Payment\n');
   const alpha = results.skills.find(s => s.name === 'Alpha Decoder');
   const pay2Tx = new Transaction().add(
     SystemProgram.transfer({
@@ -205,31 +183,30 @@ async function main() {
     explorer: `https://explorer.solana.com/tx/${pay2Sig}?cluster=devnet`,
   });
 
-  // --- Final summary ---
-  const agentBal = await connection.getBalance(agentWallet.publicKey);
-  const creatorBal = await connection.getBalance(creatorWallet.publicKey);
+  // Final summary
+  const finalAgent = await connection.getBalance(agentWallet.publicKey);
+  const finalCreator = await connection.getBalance(creatorWallet.publicKey);
   results.finalBalances = {
-    agent: (agentBal / LAMPORTS_PER_SOL).toFixed(4),
-    creator: (creatorBal / LAMPORTS_PER_SOL).toFixed(4),
+    agent: (finalAgent / LAMPORTS_PER_SOL).toFixed(4),
+    creator: (finalCreator / LAMPORTS_PER_SOL).toFixed(4),
   };
 
-  console.log('\n========================================');
+  console.log('\n=================================================');
   console.log('📊 DEPLOYMENT SUMMARY');
-  console.log('========================================');
-  console.log(`  Network:      Solana Devnet`);
-  console.log(`  Collection:   ${results.collection.mint}`);
-  console.log(`  Skills:       ${results.skills.length} NFTs minted`);
-  console.log(`  Transactions: ${results.transactions.length} total`);
+  console.log('=================================================');
+  console.log(`  Network:       Solana Devnet`);
+  console.log(`  Collection:    ${results.collection.mint}`);
+  console.log(`  Skills Minted: ${results.skills.length}`);
+  console.log(`  Transactions:  ${results.transactions.length} total`);
   console.log(`  x402 Payments: ${results.x402Payments.length}`);
   console.log(`  Agent Balance: ${results.finalBalances.agent} SOL`);
   console.log(`  Creator Balance: ${results.finalBalances.creator} SOL`);
   console.log('');
 
-  // Save everything
+  // Save
   fs.writeFileSync('deployment-results.json', JSON.stringify(results, null, 2));
   console.log('  💾 deployment-results.json saved');
 
-  // Save agent log (for GitHub)
   const agentLog = {
     agent: 'SkillDock Agent #7291',
     wallet: agentWallet.publicKey.toBase58(),
@@ -243,20 +220,13 @@ async function main() {
   fs.writeFileSync('agent-execution-log.json', JSON.stringify(agentLog, null, 2));
   console.log('  💾 agent-execution-log.json saved');
 
-  // Save keypairs
-  fs.writeFileSync('.keypairs.json', JSON.stringify({
-    deployer: Array.from(deployer.secretKey),
-    agent: Array.from(agentWallet.secretKey),
-    creator: Array.from(creatorWallet.secretKey),
-  }, null, 2));
-  console.log('  🔑 .keypairs.json saved (keep private!)');
-
-  console.log('\n✅ Done! Open deployment-results.json for all Explorer links.\n');
+  console.log('\n✅ Done! All transactions verifiable on Solana Explorer.\n');
+  console.log('Next: git add . && git commit -m "feat: add devnet deployment results" && git push');
+  console.log('');
 }
 
 main().catch(err => {
   console.error('\n❌ Error:', err.message);
-  console.error('\nTip: If rate-limited, wait 2-3 minutes and try again.');
   fs.writeFileSync('deployment-results.json', JSON.stringify(results, null, 2));
   process.exit(1);
 });
